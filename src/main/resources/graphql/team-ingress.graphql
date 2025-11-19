@@ -1,0 +1,18 @@
+query TeamIngressTypes($teamSlug: Slug!, $appFirst: Int = 100, $appAfter: Cursor) {
+  team(slug: $teamSlug) {
+    applications(first: $appFirst, after: $appAfter) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        node {
+          name
+          ingresses {
+            type
+          }
+        }
+      }
+    }
+  }
+}

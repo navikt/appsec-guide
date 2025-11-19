@@ -1,0 +1,61 @@
+name: Build and deploy main
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "*.md"
+jobs:
+  test-build-deploy:
+    permissions:
+      actions: read # for sarif
+      contents: write # for dependency graph & sarif
+      security-events: write # push sarif to github security
+      id-token: write # for nais docker-build-push
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.docker-push.outputs.image }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+      - uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2
+      - name: Test & build
+        run: ./gradlew test build
+      - name: Build & push docker image + SBOM
+        uses: nais/docker-build-push@1fae4798c79f4af4c3cdbd3fe65e51f8f3ba2368
+        id: docker-push
+        with:
+          team: appsec
+          pull: true
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2
+      - name: Scan docker image for secrets
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
+        with:
+          image-ref: '${{ steps.docker-push.outputs.image }}'
+          format: 'sarif'
+          scanners: 'secret'
+          output: 'trivy.sarif'
+      - uses: github/codeql-action/upload-sarif@64d10c13136e1c5bce3e5fbde8d4906eeaafc885
+        with:
+          sarif_file: 'trivy.sarif'
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    needs: test-build-deploy
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: nais/deploy/actions/deploy@7c152a10f4da3ca352d57a25eba0b3a8e04882f9
+        env:
+          RESOURCE: .nais/nais.yaml
+          CLUSTER: prod-gcp
+          IMAGE: ${{ needs.test-build-deploy.outputs.image }}
