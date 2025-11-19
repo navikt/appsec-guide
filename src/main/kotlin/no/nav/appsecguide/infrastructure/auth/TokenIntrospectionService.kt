@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 
 @Suppress("PropertyName")
 @Serializable
@@ -14,11 +15,17 @@ data class IntrospectionRequest(
     val token: String
 )
 
-@Serializable
 data class IntrospectionResponse(
     val active: Boolean,
-    val claims: Map<String, JsonElement> = emptyMap()
-)
+    val claims: Map<String, JsonElement>
+) {
+    companion object {
+        fun fromJsonObject(jsonObject: JsonObject): IntrospectionResponse {
+            val active = jsonObject["active"]?.toString()?.toBoolean() ?: false
+            return IntrospectionResponse(active, jsonObject.toMap())
+        }
+    }
+}
 
 interface TokenIntrospectionService {
     suspend fun introspect(token: String): IntrospectionResponse
@@ -41,7 +48,8 @@ class NaisTokenIntrospectionService(
                 ))
             }
 
-            val introspectionResponse: IntrospectionResponse = response.body()
+            val jsonObject: JsonObject = response.body()
+            val introspectionResponse = IntrospectionResponse.fromJsonObject(jsonObject)
             logger.debug("Token introspection response - active: ${introspectionResponse.active}, claims count: ${introspectionResponse.claims.size}")
             return introspectionResponse
         } catch (e: Exception) {

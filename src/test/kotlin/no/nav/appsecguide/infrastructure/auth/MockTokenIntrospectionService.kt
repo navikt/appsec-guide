@@ -8,7 +8,7 @@ class MockTokenIntrospectionService(
 ) : TokenIntrospectionService {
     override suspend fun introspect(token: String): IntrospectionResponse {
         if (!shouldSucceed) {
-            return IntrospectionResponse(active = false)
+            return IntrospectionResponse(active = false, claims = emptyMap())
         }
 
         val claims = if (navIdent != null) {
