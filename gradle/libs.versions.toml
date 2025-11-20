@@ -38,3 +38,30 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
+[bundles]
+ktor = [
+    "ktor-server-core",
+    "ktor-server-netty",
+    "ktor-server-content-negotiation",
+    "ktor-server-call-logging",
+    "ktor-server-auth",
+    "ktor-server-auth-jwt",
+    "ktor-client-core",
+    "ktor-client-cio",
+    "ktor-client-content-negotiation",
+    "ktor-serialization-kotlinx-json"
+]
+
+logging = [
+    "logback-classic",
+    "logstash-logback-encoder"
+]
+
+testing = [
+    "ktor-server-test-host",
+    "ktor-client-mock",
+    "kotlin-test-junit",
+    "kotlinx-coroutines-test",
+    "testcontainers",
+    "testcontainers-junit"
+]
