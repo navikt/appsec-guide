@@ -11,6 +11,7 @@ import no.nav.appsecguide.infrastructure.auth.NaisTokenIntrospectionService
 import no.nav.appsecguide.infrastructure.auth.TokenIntrospectionService
 import no.nav.appsecguide.infrastructure.cache.ValkeyCache
 import no.nav.appsecguide.infrastructure.cache.ValkeyClientFactory
+import no.nav.appsecguide.infrastructure.cisa.*
 import no.nav.appsecguide.infrastructure.config.AppConfig
 import no.nav.appsecguide.infrastructure.nais.*
 import kotlin.time.Duration.Companion.minutes
@@ -20,6 +21,7 @@ class Dependencies(
     config: AppConfig,
     val tokenIntrospectionService: TokenIntrospectionService,
     val naisApiService: NaisApiService,
+    val kevService: CachedKevService,
     val httpClient: HttpClient
 )
 
@@ -69,10 +71,20 @@ val DependenciesPlugin = createApplicationPlugin(name = "Dependencies") {
     )
     val naisApiService = CachedNaisApiService(naisApiClient, teamIngressCache, userAppsCache)
 
+    val kevClient = KevClient(httpClient)
+    val kevCache = ValkeyCache<String, KevCatalog>(
+        pool = valkeyPool,
+        ttl = 24.minutes * 60,
+        keyPrefix = "kev",
+        valueSerializer = KevCatalog.serializer()
+    )
+    val kevService = CachedKevService(kevClient, kevCache)
+
     val dependencies = Dependencies(
         config = config,
         tokenIntrospectionService = tokenIntrospectionService,
         naisApiService = naisApiService,
+        kevService = kevService,
         httpClient = httpClient
     )
 

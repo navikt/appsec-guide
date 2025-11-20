@@ -10,6 +10,8 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import no.nav.appsecguide.infrastructure.auth.MockTokenIntrospectionService
 import no.nav.appsecguide.infrastructure.auth.TokenIntrospectionService
+import no.nav.appsecguide.infrastructure.cisa.CachedKevService
+import no.nav.appsecguide.infrastructure.cisa.createMockCachedKevService
 import no.nav.appsecguide.infrastructure.config.AppConfig
 import no.nav.appsecguide.infrastructure.nais.MockNaisApiService
 import no.nav.appsecguide.infrastructure.nais.NaisApiService
@@ -20,6 +22,7 @@ import no.nav.appsecguide.routes.userRoutes
 fun Application.installTestDependencies(
     tokenIntrospectionService: TokenIntrospectionService = MockTokenIntrospectionService(),
     naisApiService: NaisApiService = MockNaisApiService(),
+    kevService: CachedKevService = createMockCachedKevService(),
     httpClient: HttpClient? = null
 ) {
     val client = httpClient ?: HttpClient(MockEngine) {
@@ -52,6 +55,7 @@ fun Application.installTestDependencies(
         config = testConfig,
         tokenIntrospectionService = tokenIntrospectionService,
         naisApiService = naisApiService,
+        kevService = kevService,
         httpClient = client
     )
 
@@ -60,9 +64,10 @@ fun Application.installTestDependencies(
 
 fun Application.testModule(
     tokenIntrospectionService: TokenIntrospectionService = MockTokenIntrospectionService(),
-    naisApiService: NaisApiService = MockNaisApiService()
+    naisApiService: NaisApiService = MockNaisApiService(),
+    kevService: CachedKevService = createMockCachedKevService()
 ) {
-    installTestDependencies(tokenIntrospectionService, naisApiService)
+    installTestDependencies(tokenIntrospectionService, naisApiService, kevService)
 
     install(ServerContentNegotiation) {
         json(Json {
