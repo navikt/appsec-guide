@@ -13,6 +13,8 @@ import no.nav.appsecguide.infrastructure.auth.TokenIntrospectionService
 import no.nav.appsecguide.infrastructure.cisa.KevService
 import no.nav.appsecguide.infrastructure.cisa.createMockCachedKevService
 import no.nav.appsecguide.infrastructure.config.AppConfig
+import no.nav.appsecguide.infrastructure.epss.EpssService
+import no.nav.appsecguide.infrastructure.epss.MockEpssService
 import no.nav.appsecguide.infrastructure.nais.MockNaisApiService
 import no.nav.appsecguide.infrastructure.nais.NaisApiService
 import no.nav.appsecguide.infrastructure.vulns.VulnServiceImpl
@@ -23,6 +25,7 @@ fun Application.installTestDependencies(
     tokenIntrospectionService: TokenIntrospectionService = MockTokenIntrospectionService(),
     naisApiService: NaisApiService = MockNaisApiService(),
     kevService: KevService = createMockCachedKevService(),
+    epssService: EpssService = MockEpssService(),
     httpClient: HttpClient? = null
 ) {
     val client = httpClient ?: HttpClient(MockEngine) {
@@ -51,13 +54,14 @@ fun Application.installTestDependencies(
         cacheTtlMinutes = 1
     )
 
-    val vulnService = VulnServiceImpl(naisApiService, kevService)
+    val vulnService = VulnServiceImpl(naisApiService, kevService, epssService)
 
     val dependencies = Dependencies(
         config = testConfig,
         tokenIntrospectionService = tokenIntrospectionService,
         naisApiService = naisApiService,
         kevService = kevService,
+        epssService = epssService,
         httpClient = client,
         vulnService = vulnService
     )
@@ -68,9 +72,10 @@ fun Application.installTestDependencies(
 fun Application.testModule(
     tokenIntrospectionService: TokenIntrospectionService = MockTokenIntrospectionService(),
     naisApiService: NaisApiService = MockNaisApiService(),
-    kevService: KevService = createMockCachedKevService()
+    kevService: KevService = createMockCachedKevService(),
+    epssService: EpssService = MockEpssService()
 ) {
-    installTestDependencies(tokenIntrospectionService, naisApiService, kevService)
+    installTestDependencies(tokenIntrospectionService, naisApiService, kevService, epssService)
 
     install(ServerContentNegotiation) {
         json(Json {

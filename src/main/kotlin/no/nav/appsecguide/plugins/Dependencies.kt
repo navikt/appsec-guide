@@ -13,6 +13,7 @@ import no.nav.appsecguide.infrastructure.cache.ValkeyCache
 import no.nav.appsecguide.infrastructure.cache.ValkeyClientFactory
 import no.nav.appsecguide.infrastructure.cisa.*
 import no.nav.appsecguide.infrastructure.config.AppConfig
+import no.nav.appsecguide.infrastructure.epss.*
 import no.nav.appsecguide.infrastructure.nais.*
 import no.nav.appsecguide.infrastructure.vulns.VulnService
 import no.nav.appsecguide.infrastructure.vulns.VulnServiceImpl
@@ -24,6 +25,7 @@ class Dependencies(
     val tokenIntrospectionService: TokenIntrospectionService,
     val naisApiService: NaisApiService,
     val kevService: KevService,
+    val epssService: EpssService,
     val httpClient: HttpClient,
     val vulnService: VulnService
 )
@@ -76,13 +78,23 @@ val DependenciesPlugin = createApplicationPlugin(name = "Dependencies") {
     )
     val kevService = CachedKevService(kevClient, kevCache)
 
-    val vulnService = VulnServiceImpl(naisApiService, kevService)
+    val epssClient = EpssClient(httpClient)
+    val epssCache = ValkeyCache<String, Map<String, EpssScore>>(
+        pool = valkeyPool,
+        ttl = 24.minutes * 60,
+        keyPrefix = "epss",
+        valueSerializer = kotlinx.serialization.serializer()
+    )
+    val epssService = CachedEpssService(epssClient, epssCache)
+
+    val vulnService = VulnServiceImpl(naisApiService, kevService, epssService)
 
     val dependencies = Dependencies(
         config = config,
         tokenIntrospectionService = tokenIntrospectionService,
         naisApiService = naisApiService,
         kevService = kevService,
+        epssService = epssService,
         httpClient = httpClient,
         vulnService = vulnService
     )

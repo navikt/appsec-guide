@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import no.nav.appsecguide.infrastructure.cisa.KevCatalog
 import no.nav.appsecguide.infrastructure.cisa.KevService
 import no.nav.appsecguide.infrastructure.cisa.KevVulnerability
+import no.nav.appsecguide.infrastructure.epss.MockEpssService
 import no.nav.appsecguide.infrastructure.nais.*
 import kotlin.test.*
 
@@ -76,7 +77,7 @@ class VulnServiceTest {
             }
         }
 
-        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService)
+        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService, MockEpssService())
         val result = vulnService.fetchVulnerabilitiesForUser("test@example.com")
 
         assertEquals(1, result.teams.size)
@@ -135,7 +136,7 @@ class VulnServiceTest {
             )
         }
 
-        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService)
+        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService, MockEpssService())
         val result = vulnService.fetchVulnerabilitiesForUser("test@example.com")
 
         assertTrue(result.teams.isEmpty())
@@ -163,7 +164,7 @@ class VulnServiceTest {
             )
         }
 
-        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService)
+        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService, MockEpssService())
         val result = vulnService.fetchVulnerabilitiesForUser("test@example.com")
 
         assertTrue(result.teams.isEmpty())
@@ -209,7 +210,7 @@ class VulnServiceTest {
             )
         }
 
-        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService)
+        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService, MockEpssService())
         val result = vulnService.fetchVulnerabilitiesForUser("test@example.com")
 
         assertEquals(1, result.teams.size)
@@ -298,7 +299,7 @@ class VulnServiceTest {
             )
         }
 
-        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService)
+        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService, MockEpssService())
         val result = vulnService.fetchVulnerabilitiesForUser("test@example.com")
 
         assertEquals(2, result.teams.size)
@@ -332,7 +333,7 @@ class VulnServiceTest {
             )
         }
 
-        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService)
+        val vulnService = VulnServiceImpl(mockNaisApiService, mockKevService, MockEpssService())
         val result = vulnService.fetchVulnerabilitiesForUser("test@example.com")
 
         assertEquals(0, result.teams.size)

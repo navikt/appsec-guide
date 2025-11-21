@@ -5,11 +5,13 @@ import no.nav.appsecguide.domain.VulnTeamDto
 import no.nav.appsecguide.domain.VulnVulnerabilityDto
 import no.nav.appsecguide.domain.VulnWorkloadDto
 import no.nav.appsecguide.infrastructure.cisa.KevService
+import no.nav.appsecguide.infrastructure.epss.EpssService
 import no.nav.appsecguide.infrastructure.nais.NaisApiService
 
 class VulnServiceImpl(
     private val naisApiService: NaisApiService,
     private val kevService: KevService,
+    private val epssService: EpssService,
 ) : VulnService {
 
     override suspend fun fetchVulnerabilitiesForUser(email: String): VulnResponse {
@@ -18,6 +20,14 @@ class VulnServiceImpl(
         val kevCatalog = kevService.getKevCatalog()
 
         val kevCveIds = kevCatalog.vulnerabilities.map { it.cveID }.toSet()
+
+        val allCveIds = vulnerabilitiesData.teams
+            .flatMap { it.workloads }
+            .flatMap { it.vulnerabilities }
+            .map { it.identifier }
+            .distinct()
+
+        val epssScores = epssService.getEpssScores(allCveIds)
 
         val teams = vulnerabilitiesData.teams.mapNotNull { teamVulns ->
             val teamSlug = teamVulns.teamSlug
@@ -32,11 +42,14 @@ class VulnServiceImpl(
 
             val workloads = teamVulns.workloads.mapNotNull { workload ->
                 val vulnerabilities = workload.vulnerabilities.map { vuln ->
+                    val epssScore = epssScores[vuln.identifier]
                     VulnVulnerabilityDto(
                         identifier = vuln.identifier,
                         severity = vuln.severity,
                         suppressed = vuln.suppressed,
-                        hasKevEntry = kevCveIds.contains(vuln.identifier)
+                        hasKevEntry = kevCveIds.contains(vuln.identifier),
+                        epssScore = epssScore?.epss,
+                        epssPercentile = epssScore?.percentile
                     )
                 }
 

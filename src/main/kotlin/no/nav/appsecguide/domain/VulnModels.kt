@@ -25,6 +25,8 @@ data class VulnVulnerabilityDto(
     val identifier: String,
     val severity: String,
     val suppressed: Boolean,
-    val hasKevEntry: Boolean
+    val hasKevEntry: Boolean,
+    val epssScore: String? = null,
+    val epssPercentile: String? = null
 )
 
