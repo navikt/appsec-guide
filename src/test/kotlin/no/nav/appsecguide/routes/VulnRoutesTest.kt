@@ -15,11 +15,53 @@ import no.nav.appsecguide.infrastructure.nais.*
 import no.nav.appsecguide.plugins.testModule
 import kotlin.test.*
 
+// Helper constant for an empty KEV catalog for test use
+private val EMPTY_KEV_CATALOG = KevCatalog(
+    title = "Test KEV Catalog",
+    catalogVersion = "1.0",
+    dateReleased = "2023-01-01",
+    count = 0,
+    vulnerabilities = emptyList()
+)
+
 class MockKevService(private val catalog: KevCatalog) : KevService {
     override suspend fun getKevCatalog() = catalog
 }
 
+// Helper extension function to deserialize and handle errors for test responses
+private suspend inline fun <reified T> HttpResponse.deserializeBody(): T {
+    return try {
+        Json.decodeFromString<T>(this.bodyAsText())
+    } catch (e: Exception) {
+        throw AssertionError("Failed to deserialize response body to ${T::class.simpleName}: '${this.bodyAsText()}'", e)
+    }
+}
+
 class VulnRoutesTest {
+
+    private fun testKevService(): KevService = MockKevService(
+        KevCatalog(
+            title = "Test KEV Catalog",
+            catalogVersion = "1.0",
+            dateReleased = "2023-01-01",
+            count = 1,
+            vulnerabilities = listOf(
+                KevVulnerability(
+                    cveID = "CVE-2023-12345",
+                    vendorProject = "Test Vendor",
+                    product = "Test Product",
+                    vulnerabilityName = "Test Vulnerability",
+                    dateAdded = "2023-01-01",
+                    shortDescription = "Test description",
+                    requiredAction = "Test action",
+                    dueDate = "2023-12-31",
+                    knownRansomwareCampaignUse = "Unknown",
+                    notes = "Test notes",
+                    cwes = emptyList()
+                )
+            )
+        )
+    )
 
     @Test
     fun `should return vulnerabilities for authenticated user`() = testApplication {
@@ -62,29 +104,7 @@ class VulnRoutesTest {
             )
         )
 
-        val kevService = MockKevService(
-            KevCatalog(
-                title = "Test KEV Catalog",
-                catalogVersion = "1.0",
-                dateReleased = "2023-01-01",
-                count = 1,
-                vulnerabilities = listOf(
-                    KevVulnerability(
-                        cveID = "CVE-2023-12345",
-                        vendorProject = "Test Vendor",
-                        product = "Test Product",
-                        vulnerabilityName = "Test Vulnerability",
-                        dateAdded = "2023-01-01",
-                        shortDescription = "Test description",
-                        requiredAction = "Test action",
-                        dueDate = "2023-12-31",
-                        knownRansomwareCampaignUse = "Unknown",
-                        notes = "Test notes",
-                        cwes = emptyList()
-                    )
-                )
-            )
-        )
+        val kevService = testKevService()
 
         application {
             testModule(tokenIntrospectionService, naisApiService, kevService)
@@ -97,7 +117,7 @@ class VulnRoutesTest {
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(ContentType.Application.Json, response.contentType()?.withoutParameters())
 
-        val vulnResponse = Json.decodeFromString<VulnResponse>(response.bodyAsText())
+        val vulnResponse = response.deserializeBody<VulnResponse>()
         assertEquals(1, vulnResponse.teams.size)
         assertEquals("team-alpha", vulnResponse.teams[0].team)
         assertEquals(1, vulnResponse.teams[0].workloads.size)
@@ -204,13 +224,7 @@ class VulnRoutesTest {
         )
 
         val kevService = MockKevService(
-            KevCatalog(
-                title = "Test KEV Catalog",
-                catalogVersion = "1.0",
-                dateReleased = "2023-01-01",
-                count = 0,
-                vulnerabilities = emptyList()
-            )
+            EMPTY_KEV_CATALOG
         )
 
         application {
@@ -278,13 +292,7 @@ class VulnRoutesTest {
         )
 
         val kevService = MockKevService(
-            KevCatalog(
-                title = "Test KEV Catalog",
-                catalogVersion = "1.0",
-                dateReleased = "2023-01-01",
-                count = 0,
-                vulnerabilities = emptyList()
-            )
+            EMPTY_KEV_CATALOG
         )
 
         application {
