@@ -24,7 +24,7 @@ spec:
     outbound:
       external:
         - host: console.nav.cloud.nais.io
-        - host: cisa.gov
+        - host: www.cisa.gov
   valkey:
     - instance: appsec
       access: readwrite
