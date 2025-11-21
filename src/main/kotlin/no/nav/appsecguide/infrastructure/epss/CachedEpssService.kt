@@ -11,7 +11,10 @@ class CachedEpssService(
     private val logger = LoggerFactory.getLogger(CachedEpssService::class.java)
 
     companion object {
+        // https://api.first.org/epss/
         private const val MAX_PARAMETER_LENGTH = 2000
+        // https://github.com/CVEProject/cve-schema/blob/main/schema/CVE_Record_Format.json
+        private val CVE_PATTERN = Regex("^CVE-[0-9]{4}-[0-9]{4,19}$")
     }
 
     override suspend fun getEpssScores(cveIds: List<String>): Map<String, EpssScore> {
@@ -19,18 +22,30 @@ class CachedEpssService(
             return emptyMap()
         }
 
-        val cacheKey = generateCacheKey(cveIds)
+        val validCveIds = cveIds.filter { it.matches(CVE_PATTERN) }
+        val invalidCveIds = cveIds.filterNot { it.matches(CVE_PATTERN) }
+
+        if (invalidCveIds.isNotEmpty()) {
+            logger.warn("Filtered out ${invalidCveIds.size} invalid CVE ID(s): ${invalidCveIds.take(5).joinToString(", ")}${if (invalidCveIds.size > 5) "..." else ""}")
+        }
+
+        if (validCveIds.isEmpty()) {
+            logger.debug("No valid CVE IDs to fetch EPSS scores for")
+            return emptyMap()
+        }
+
+        val cacheKey = generateCacheKey(validCveIds)
 
         cache.get(cacheKey)?.let { cachedScores ->
-            logger.info("Cache hit for EPSS scores (${cveIds.size} CVEs)")
+            logger.info("Cache hit for EPSS scores (${validCveIds.size} CVEs)")
             return cachedScores
         }
 
-        logger.debug("Cache miss for EPSS scores, fetching from API for ${cveIds.size} CVEs")
+        logger.debug("Cache miss for EPSS scores, fetching from API for ${validCveIds.size} CVEs")
 
         return try {
-            val batches = createBatches(cveIds)
-            logger.debug("Split ${cveIds.size} CVEs into ${batches.size} batch(es) to respect 2000 character limit")
+            val batches = createBatches(validCveIds)
+            logger.debug("Split ${validCveIds.size} CVEs into ${batches.size} batch(es) to respect 2000 character limit")
 
             val allScores = batches.flatMap { batch ->
                 val response = epssClient.getEpssScores(batch)

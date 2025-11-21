@@ -316,6 +316,130 @@ class CachedEpssServiceTest {
     }
 
     @Test
+    fun `should filter out invalid CVE IDs`() = runTest {
+        var requestCount = 0
+        val mockEngine = MockEngine { request ->
+            requestCount++
+            val cveParam = request.url.parameters["cve"] ?: ""
+            assertFalse(cveParam.contains("INVALID"))
+            assertFalse(cveParam.contains("CVE-123"))
+            assertTrue(cveParam.contains("CVE-2021-44228"))
+
+            respond(
+                content = """
+                    {
+                        "status": "OK",
+                        "status-code": 200,
+                        "total": 1,
+                        "data": [
+                            {
+                                "cve": "CVE-2021-44228",
+                                "epss": "0.942510000",
+                                "percentile": "0.999630000",
+                                "date": "2025-11-20"
+                            }
+                        ]
+                    }
+                """.trimIndent(),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+
+        val epssClient = EpssClient(httpClient)
+        val cache = InMemoryCache<String, Map<String, EpssScore>>()
+        val service = CachedEpssService(epssClient, cache)
+
+        val result = service.getEpssScores(listOf("CVE-2021-44228", "INVALID-CVE", "CVE-123", "not-a-cve"))
+
+        assertEquals(1, result.size)
+        assertEquals("CVE-2021-44228", result.keys.first())
+        assertEquals(1, requestCount)
+    }
+
+    @Test
+    fun `should return empty map when all CVE IDs are invalid`() = runTest {
+        val mockEngine = MockEngine { _ ->
+            fail("Should not make HTTP request when all CVEs are invalid")
+        }
+
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+
+        val epssClient = EpssClient(httpClient)
+        val cache = InMemoryCache<String, Map<String, EpssScore>>()
+        val service = CachedEpssService(epssClient, cache)
+
+        val result = service.getEpssScores(listOf("INVALID-CVE", "CVE-123", "not-a-cve"))
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `should accept valid CVE formats`() = runTest {
+        var requestCount = 0
+        val mockEngine = MockEngine { request ->
+            requestCount++
+            val cveParam = request.url.parameters["cve"] ?: ""
+            val cves = cveParam.split(",")
+
+            val data = cves.map {
+                """
+                {
+                    "cve": "$it",
+                    "epss": "0.001230000",
+                    "percentile": "0.456780000",
+                    "date": "2025-11-20"
+                }
+                """.trimIndent()
+            }.joinToString(",")
+
+            respond(
+                content = """
+                    {
+                        "status": "OK",
+                        "status-code": 200,
+                        "total": ${cves.size},
+                        "data": [$data]
+                    }
+                """.trimIndent(),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+
+        val epssClient = EpssClient(httpClient)
+        val cache = InMemoryCache<String, Map<String, EpssScore>>()
+        val service = CachedEpssService(epssClient, cache)
+
+        val validCves = listOf(
+            "CVE-2021-44228",
+            "CVE-2022-22965",
+            "CVE-1999-0001",
+            "CVE-2023-12345"
+        )
+
+        val result = service.getEpssScores(validCves)
+
+        assertEquals(4, result.size)
+        assertEquals(1, requestCount)
+    }
+
+    @Test
     fun `should handle multiple CVEs and return as map`() = runTest {
         val mockEngine = MockEngine { _ ->
             respond(
