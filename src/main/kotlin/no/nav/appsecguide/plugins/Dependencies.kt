@@ -57,20 +57,13 @@ val DependenciesPlugin = createApplicationPlugin(name = "Dependencies") {
         config.valkeyUsername,
         config.valkeyPassword
     )
-    val teamIngressCache = ValkeyCache<String, ApplicationsForTeamResponse>(
+    val naisApiCache = ValkeyCache<String, String>(
         pool = valkeyPool,
         ttl = config.cacheTtlMinutes.minutes,
-        keyPrefix = "nais-team-apps",
-        valueSerializer = ApplicationsForTeamResponse.serializer()
+        keyPrefix = "nais-api",
+        valueSerializer = kotlinx.serialization.serializer()
     )
-    val userAppsCache = ValkeyCache<String, ApplicationsForUserResponse>(
-        pool = valkeyPool,
-        ttl = config.cacheTtlMinutes.minutes,
-        keyPrefix = "nais-user-apps",
-        valueSerializer = ApplicationsForUserResponse.serializer()
-    )
-    val naisApiService = CachedNaisApiService(naisApiClient, teamIngressCache, userAppsCache)
-
+    val naisApiService = CachedNaisApiService(naisApiClient, naisApiCache)
     val kevClient = KevClient(httpClient)
     val kevCache = ValkeyCache<String, KevCatalog>(
         pool = valkeyPool,

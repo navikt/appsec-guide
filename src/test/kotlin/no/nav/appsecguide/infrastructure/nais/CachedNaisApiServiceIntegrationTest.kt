@@ -21,8 +21,7 @@ class CachedNaisApiServiceIntegrationTest {
 
     companion object {
         private lateinit var valkeyContainer: GenericContainer<*>
-        private lateinit var teamIngressCache: ValkeyCache<String, ApplicationsForTeamResponse>
-        private lateinit var userAppsCache: ValkeyCache<String, ApplicationsForUserResponse>
+        private lateinit var naisApiCache: ValkeyCache<String, String>
 
         @JvmStatic
         @BeforeAll
@@ -36,17 +35,11 @@ class CachedNaisApiServiceIntegrationTest {
             val valkeyUri = "redis://$host:$port"
 
             val pool = createTestValkeyPool(valkeyUri)
-            teamIngressCache = ValkeyCache(
+            naisApiCache = ValkeyCache<String, String>(
                 pool = pool,
                 ttl = 5.minutes,
-                keyPrefix = "nais-team-ingress-test",
-                valueSerializer = ApplicationsForTeamResponse.serializer()
-            )
-            userAppsCache = ValkeyCache(
-                pool = pool,
-                ttl = 5.minutes,
-                keyPrefix = "nais-user-apps-test",
-                valueSerializer = ApplicationsForUserResponse.serializer()
+                keyPrefix = "nais-api-test",
+                valueSerializer = kotlinx.serialization.serializer()
             )
         }
 
@@ -63,18 +56,15 @@ class CachedNaisApiServiceIntegrationTest {
         @JvmStatic
         @AfterAll
         fun teardown() {
-            teamIngressCache.close()
-            userAppsCache.close()
             valkeyContainer.stop()
         }
     }
 
     @Test
     fun `should cache NAIS API responses`() = runTest {
-        teamIngressCache.clear()
         var apiCallCount = 0
 
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             apiCallCount++
             respond(
                 content = """
@@ -113,7 +103,7 @@ class CachedNaisApiServiceIntegrationTest {
         }
 
         val naisApiClient = NaisApiClient(httpClient, "http://test", "test-token")
-        val cachedService = CachedNaisApiService(naisApiClient, teamIngressCache, userAppsCache)
+        val cachedService = CachedNaisApiService(naisApiClient, naisApiCache)
 
         val response1 = cachedService.getApplicationsForTeam("test-team")
         val response2 = cachedService.getApplicationsForTeam("test-team")
@@ -126,10 +116,9 @@ class CachedNaisApiServiceIntegrationTest {
 
     @Test
     fun `should not cache error responses`() = runTest {
-        teamIngressCache.clear()
         var apiCallCount = 0
 
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             apiCallCount++
             respond(
                 content = """{"errors":[{"message":"Team not found"}]}""",
@@ -145,7 +134,7 @@ class CachedNaisApiServiceIntegrationTest {
         }
 
         val naisApiClient = NaisApiClient(httpClient, "http://test", "test-token")
-        val cachedService = CachedNaisApiService(naisApiClient, teamIngressCache, userAppsCache)
+        val cachedService = CachedNaisApiService(naisApiClient, naisApiCache)
 
         cachedService.getApplicationsForTeam("nonexistent-team")
         cachedService.getApplicationsForTeam("nonexistent-team")
@@ -155,10 +144,9 @@ class CachedNaisApiServiceIntegrationTest {
 
     @Test
     fun `should generate different cache keys for different teams`() = runTest {
-        teamIngressCache.clear()
         var apiCallCount = 0
 
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             apiCallCount++
             respond(
                 content = """
@@ -188,7 +176,7 @@ class CachedNaisApiServiceIntegrationTest {
         }
 
         val naisApiClient = NaisApiClient(httpClient, "http://test", "test-token")
-        val cachedService = CachedNaisApiService(naisApiClient, teamIngressCache, userAppsCache)
+        val cachedService = CachedNaisApiService(naisApiClient, naisApiCache)
 
         cachedService.getApplicationsForTeam("team1")
         cachedService.getApplicationsForTeam("team2")

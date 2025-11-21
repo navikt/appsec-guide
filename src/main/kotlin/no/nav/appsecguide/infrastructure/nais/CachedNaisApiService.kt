@@ -1,21 +1,21 @@
 package no.nav.appsecguide.infrastructure.nais
 
-import no.nav.appsecguide.infrastructure.cache.ValkeyCache
+import kotlinx.serialization.json.Json
+import no.nav.appsecguide.infrastructure.cache.Cache
 import org.slf4j.LoggerFactory
-import java.security.MessageDigest
 
 class CachedNaisApiService(
     private val apiClient: NaisApiClient,
-    private val teamAppsCache: ValkeyCache<String, ApplicationsForTeamResponse>,
-    private val userAppsCache: ValkeyCache<String, ApplicationsForUserResponse>
+    private val cache: Cache<String, String>
 ) : NaisApiService {
     private val logger = LoggerFactory.getLogger(CachedNaisApiService::class.java)
+    private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun getApplicationsForTeam(teamSlug: String): ApplicationsForTeamResponse {
-        val cacheKey = generateCacheKey("team:$teamSlug")
+        val cacheKey = "team:$teamSlug"
 
-        teamAppsCache.get(cacheKey)?.let { cachedResponse ->
-            return cachedResponse
+        cache.get(cacheKey)?.let { jsonString ->
+            return json.decodeFromString(ApplicationsForTeamResponse.serializer(), jsonString)
         }
 
         val response = apiClient.getApplicationsForTeam(teamSlug)
@@ -23,17 +23,18 @@ class CachedNaisApiService(
         if (response.errors != null && response.errors.isNotEmpty()) {
             logger.warn("Not caching error response for team: $teamSlug")
         } else {
-            teamAppsCache.put(cacheKey, response)
+            val jsonString = json.encodeToString(ApplicationsForTeamResponse.serializer(), response)
+            cache.put(cacheKey, jsonString)
         }
 
         return response
     }
 
     override suspend fun getApplicationsForUser(email: String): ApplicationsForUserResponse {
-        val cacheKey = generateCacheKey("user:$email")
+        val cacheKey = "user:$email"
 
-        userAppsCache.get(cacheKey)?.let { cachedResponse ->
-            return cachedResponse
+        cache.get(cacheKey)?.let { jsonString ->
+            return json.decodeFromString(ApplicationsForUserResponse.serializer(), jsonString)
         }
 
         val response = apiClient.getApplicationsForUser(email)
@@ -41,16 +42,11 @@ class CachedNaisApiService(
         if (response.errors != null && response.errors.isNotEmpty()) {
             logger.warn("Not caching error response for user: $email")
         } else {
-            userAppsCache.put(cacheKey, response)
+            val jsonString = json.encodeToString(ApplicationsForUserResponse.serializer(), response)
+            cache.put(cacheKey, jsonString)
         }
 
         return response
-    }
-
-    private fun generateCacheKey(prefix: String): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val hashBytes = digest.digest(prefix.toByteArray())
-        return hashBytes.joinToString("") { "%02x".format(it) }.take(16)
     }
 }
 
