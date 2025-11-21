@@ -29,10 +29,10 @@ spec:
   image: {{image}}
   port: 8080
   liveness:
-    initialDelay: 30
+    initialDelay: 10
     path: isalive
   readiness:
-    initialDelay: 30
+    initialDelay: 10
     path: isready
   replicas:
     max: 2
@@ -41,8 +41,8 @@ spec:
     limits:
       memory: 256Mi
     requests:
-      cpu: 50m
-      memory: 64Mi
+      cpu: 21m
+      memory: 192Mi
   observability:
     logging:
       destinations:
