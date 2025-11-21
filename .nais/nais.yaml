@@ -6,8 +6,6 @@ metadata:
   labels:
     team: appsec
 spec:
-  ingresses:
-    - https://appsec-guide.intern.nav.no
   azure:
     application:
       enabled: true
@@ -17,9 +15,6 @@ spec:
           - id: "d633d27b-a470-4b9d-984e-85499f126e18"
         extra:
           - "NAVident"
-    sidecar:
-      enabled: true
-      autoLogin: true
   accessPolicy:
     inbound:
       rules:
