@@ -1,2 +1,2 @@
-rootProject.name = "appsec-guide"
+rootProject.name = "tpt"
 

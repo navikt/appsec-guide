@@ -2,9 +2,10 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.fabrikt)
 }
 
-group = "no.nav.appsecguide"
+group = "no.nav.tpt"
 version = "0.0.1"
 
 kotlin {
@@ -12,7 +13,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("no.nav.appsecguide.ApplicationKt")
+    mainClass.set("no.nav.tpt.ApplicationKt")
 }
 
 repositories {
@@ -38,3 +39,9 @@ tasks.test {
     }
 }
 
+fabrikt {
+    generate("openapi") {
+        apiFile = file("src/main/resources/openapi.yaml")
+        basePackage = "no.nav.tpt"
+    }
+}

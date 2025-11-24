@@ -1,4 +1,4 @@
-# AppSec Guide
+# Titt-På-Ting Backend
 
 API to help developers prioritize which security issues to fix first. Fetches vulnerability data from NAIS, enriches with CISA KEV catalog, and returns prioritized results.
 

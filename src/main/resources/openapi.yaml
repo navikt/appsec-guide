@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: Titt-På-Ting Backend API
+  description: API to help developers prioritize which security issues to fix first. Fetches vulnerability data from NAIS, enriches with CISA KEV catalog, and returns prioritized results.
+  version: 0.0.1
+  contact:
+    name: Appsec
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  /isalive:
+    get:
+      summary: Liveness probe
+      description: Returns liveness status of the application
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Application is alive
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: A-OK
+  /isready:
+    get:
+      summary: Readiness probe
+      description: Returns readiness status of the application
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Application is ready
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: KIROV REPORTING
+  /vulnerabilities/user:
+    get:
+      summary: Get vulnerabilities for authenticated user
+      description: Fetches prioritized vulnerabilities for the authenticated user's teams and workloads
+      tags:
+        - Vulnerabilities
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved vulnerabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VulnResponse'
+        '400':
+          description: Bad request - preferred_username claim not found in token
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '401':
+          description: Unauthorized - invalid or missing bearer token
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token authentication using JWT
+  schemas:
+    VulnResponse:
+      type: object
+      required:
+        - teams
+      properties:
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/VulnTeamDto'
+    VulnTeamDto:
+      type: object
+      required:
+        - team
+        - workloads
+      properties:
+        team:
+          type: string
+          description: Team name
+        workloads:
+          type: array
+          items:
+            $ref: '#/components/schemas/VulnWorkloadDto'
+    VulnWorkloadDto:
+      type: object
+      required:
+        - name
+        - ingressTypes
+        - vulnerabilities
+      properties:
+        name:
+          type: string
+          description: Workload name
+        ingressTypes:
+          type: array
+          items:
+            type: string
+          description: List of ingress types for this workload
+        vulnerabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/VulnVulnerabilityDto'
+    VulnVulnerabilityDto:
+      type: object
+      required:
+        - identifier
+        - severity
+        - suppressed
+        - hasKevEntry
+      properties:
+        identifier:
+          type: string
+          description: Vulnerability identifier (e.g., CVE-2024-1234)
+        severity:
+          type: string
+          description: Severity level of the vulnerability
+        suppressed:
+          type: boolean
+          description: Whether the vulnerability has been suppressed
+        hasKevEntry:
+          type: boolean
+          description: Whether the vulnerability is in CISA's KEV catalog
+        epssScore:
+          type: string
+          nullable: true
+          description: EPSS score for the vulnerability
+        epssPercentile:
+          type: string
+          nullable: true
+          description: EPSS percentile for the vulnerability
+    ProblemDetail:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type
+          example: about:blank
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code
+          example: 400
+        detail:
+          type: string
+          nullable: true
+          description: A human-readable explanation specific to this occurrence of the problem
+        instance:
+          type: string
+          nullable: true
+          description: A URI reference that identifies the specific occurrence of the problem
