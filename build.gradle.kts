@@ -43,5 +43,8 @@ fabrikt {
     generate("openapi") {
         apiFile = file("src/main/resources/openapi.yaml")
         basePackage = "no.nav.tpt"
+        model {
+            serializationLibrary = Kotlinx
+        }
     }
 }
