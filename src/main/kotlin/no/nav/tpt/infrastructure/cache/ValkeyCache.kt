@@ -140,7 +140,7 @@ object ValkeyClientFactory {
         userName: String,
         password: String
     ): ValkeyPool {
-        logger.info("Connecting to Valkey at $host:$port as user $userName")
+        logger.info("Connecting to Valkey at {}:{} as user {}", host, port, userName)
 
         val hostAndPort = HostAndPort(host, port)
         val config = DefaultJedisClientConfig.builder()
