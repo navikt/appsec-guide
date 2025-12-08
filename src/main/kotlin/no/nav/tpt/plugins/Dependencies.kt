@@ -91,7 +91,8 @@ val DependenciesPlugin = createApplicationPlugin(name = "Dependencies") {
     )
     val epssService = CachedEpssService(epssClient, epssCache, epssCircuitBreaker)
 
-    val vulnService = VulnServiceImpl(naisApiService, kevService, epssService)
+    val riskScorer = no.nav.tpt.domain.risk.DefaultRiskScorer()
+    val vulnService = VulnServiceImpl(naisApiService, kevService, epssService, riskScorer)
 
     val dependencies = Dependencies(
         config = config,

@@ -1,9 +1,11 @@
 package no.nav.tpt.infrastructure.vulns
 
+import no.nav.tpt.domain.RiskScore
 import no.nav.tpt.domain.VulnResponse
 import no.nav.tpt.domain.VulnTeamDto
 import no.nav.tpt.domain.VulnVulnerabilityDto
 import no.nav.tpt.domain.VulnWorkloadDto
+import no.nav.tpt.domain.risk.RiskScorer
 import no.nav.tpt.infrastructure.cisa.KevService
 import no.nav.tpt.infrastructure.epss.EpssService
 import no.nav.tpt.infrastructure.nais.ImageTagParser
@@ -13,6 +15,7 @@ class VulnServiceImpl(
     private val naisApiService: NaisApiService,
     private val kevService: KevService,
     private val epssService: EpssService,
+    private val riskScorer: RiskScorer
 ) : VulnService {
 
     override suspend fun fetchVulnerabilitiesForUser(email: String): VulnResponse {
@@ -42,15 +45,29 @@ class VulnServiceImpl(
             }
 
             val workloads = teamVulns.workloads.mapNotNull { workload ->
+                val ingressTypes = appIngressMap[workload.name]?.map { it.name } ?: emptyList()
+
                 val vulnerabilities = workload.vulnerabilities.map { vuln ->
                     val epssScore = epssScores[vuln.identifier]
+                    val hasKevEntry = kevCveIds.contains(vuln.identifier)
+
+                    val riskContext = no.nav.tpt.domain.risk.VulnerabilityRiskContext(
+                        severity = vuln.severity,
+                        ingressTypes = ingressTypes,
+                        hasKevEntry = hasKevEntry,
+                        epssScore = epssScore?.epss,
+                        suppressed = vuln.suppressed
+                    )
+                    val riskScoreValue = riskScorer.calculateRiskScore(riskContext)
+
                     VulnVulnerabilityDto(
                         identifier = vuln.identifier,
                         severity = vuln.severity,
                         suppressed = vuln.suppressed,
-                        hasKevEntry = kevCveIds.contains(vuln.identifier),
+                        hasKevEntry = hasKevEntry,
                         epssScore = epssScore?.epss,
-                        epssPercentile = epssScore?.percentile
+                        epssPercentile = epssScore?.percentile,
+                        riskScore = riskScoreValue
                     )
                 }
 
@@ -61,7 +78,7 @@ class VulnServiceImpl(
                     VulnWorkloadDto(
                         id = workload.id,
                         name = workload.name,
-                        ingressTypes = appIngressMap[workload.name]?.map { it.name } ?: emptyList(),
+                        ingressTypes = ingressTypes,
                         buildTime = buildTime,
                         vulnerabilities = vulnerabilities
                     )

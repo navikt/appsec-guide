@@ -54,7 +54,8 @@ fun Application.installTestDependencies(
         cacheTtlMinutes = 1
     )
 
-    val vulnService = VulnServiceImpl(naisApiService, kevService, epssService)
+    val riskScorer = no.nav.tpt.domain.risk.DefaultRiskScorer()
+    val vulnService = VulnServiceImpl(naisApiService, kevService, epssService, riskScorer)
 
     val dependencies = Dependencies(
         config = testConfig,
