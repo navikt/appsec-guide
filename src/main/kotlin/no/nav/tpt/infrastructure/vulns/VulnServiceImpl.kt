@@ -1,6 +1,5 @@
 package no.nav.tpt.infrastructure.vulns
 
-import no.nav.tpt.domain.RiskScore
 import no.nav.tpt.domain.VulnResponse
 import no.nav.tpt.domain.VulnTeamDto
 import no.nav.tpt.domain.VulnVulnerabilityDto
@@ -40,12 +39,12 @@ class VulnServiceImpl(
                 .firstOrNull { it.teamSlug == teamSlug }
                 ?.applications ?: emptyList()
 
-            val appIngressMap = teamApplications.associate { app ->
-                app.name to app.ingressTypes
-            }
+            val appMap = teamApplications.associateBy { it.name }
 
             val workloads = teamVulns.workloads.mapNotNull { workload ->
-                val ingressTypes = appIngressMap[workload.name]?.map { it.name } ?: emptyList()
+                val app = appMap[workload.name]
+                val ingressTypes = app?.ingressTypes?.map { it.name } ?: emptyList()
+                val environment = app?.environment
 
                 val vulnerabilities = workload.vulnerabilities.map { vuln ->
                     val epssScore = epssScores[vuln.identifier]
@@ -56,7 +55,8 @@ class VulnServiceImpl(
                         ingressTypes = ingressTypes,
                         hasKevEntry = hasKevEntry,
                         epssScore = epssScore?.epss,
-                        suppressed = vuln.suppressed
+                        suppressed = vuln.suppressed,
+                        environment = environment
                     )
                     val riskScoreValue = riskScorer.calculateRiskScore(riskContext)
 
@@ -79,6 +79,7 @@ class VulnServiceImpl(
                         id = workload.id,
                         name = workload.name,
                         ingressTypes = ingressTypes,
+                        environment = environment,
                         buildTime = buildTime,
                         vulnerabilities = vulnerabilities
                     )

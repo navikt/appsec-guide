@@ -119,6 +119,11 @@ components:
           items:
             $ref: '#/components/schemas/IngressType'
           description: List of ingress types for this workload
+        environment:
+          type: string
+          nullable: true
+          description: Deployment environment name (e.g., prod, dev)
+          example: "prod"
         buildTime:
           type: string
           nullable: true

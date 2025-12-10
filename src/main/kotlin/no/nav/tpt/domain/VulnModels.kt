@@ -18,6 +18,7 @@ data class VulnWorkloadDto(
     val id: String,
     val name: String,
     val ingressTypes: List<String>,
+    val environment: String?,
     val buildTime: String?,
     val vulnerabilities: List<VulnVulnerabilityDto>
 )

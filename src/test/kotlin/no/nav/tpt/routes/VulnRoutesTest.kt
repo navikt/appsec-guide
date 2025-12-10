@@ -36,7 +36,7 @@ class VulnRoutesTest {
                     TeamApplicationsData(
                         teamSlug = "team-alpha",
                         applications = listOf(
-                            ApplicationData(name = "app1", ingressTypes = listOf(IngressType.INTERNAL))
+                            ApplicationData(name = "app1", ingressTypes = listOf(IngressType.INTERNAL), environment = null)
                         )
                     )
                 )
@@ -243,11 +243,11 @@ class VulnRoutesTest {
                 teams = listOf(
                     TeamApplicationsData(
                         teamSlug = "team-one",
-                        applications = listOf(ApplicationData(name = "app-a", ingressTypes = listOf(IngressType.EXTERNAL)))
+                        applications = listOf(ApplicationData(name = "app-a", ingressTypes = listOf(IngressType.EXTERNAL), environment = "prod"))
                     ),
                     TeamApplicationsData(
                         teamSlug = "team-two",
-                        applications = listOf(ApplicationData(name = "app-b", ingressTypes = listOf(IngressType.INTERNAL)))
+                        applications = listOf(ApplicationData(name = "app-b", ingressTypes = listOf(IngressType.INTERNAL), environment = "dev"))
                     )
                 )
             ),

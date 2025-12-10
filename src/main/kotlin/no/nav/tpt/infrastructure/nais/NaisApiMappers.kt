@@ -4,7 +4,8 @@ internal fun ApplicationsForTeamResponse.toData(teamSlug: String): TeamApplicati
     val applications = data?.team?.applications?.nodes?.map { app ->
         ApplicationData(
             name = app.name,
-            ingressTypes = app.ingresses.map { IngressType.fromString(it.type) }.distinct()
+            ingressTypes = app.ingresses.map { IngressType.fromString(it.type) }.distinct(),
+            environment = null
         )
     } ?: emptyList()
 
@@ -19,7 +20,8 @@ internal fun ApplicationsForUserResponse.toData(): UserApplicationsData {
         val applications = teamNode.team.applications.nodes.map { app ->
             ApplicationData(
                 name = app.name,
-                ingressTypes = app.ingresses.map { IngressType.fromString(it.type) }.distinct()
+                ingressTypes = app.ingresses.map { IngressType.fromString(it.type) }.distinct(),
+                environment = app.deployments.nodes.firstOrNull()?.environmentName
             )
         }
         TeamApplicationsData(

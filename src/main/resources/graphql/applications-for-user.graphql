@@ -14,6 +14,11 @@ query ApplicationsForUser($email: String!, $appFirst: Int = 100, $appAfter: Curs
               ingresses {
                 type
               }
+              deployments(first: 1) {
+                nodes {
+                  environmentName
+                }
+              }
             }
           }
         }

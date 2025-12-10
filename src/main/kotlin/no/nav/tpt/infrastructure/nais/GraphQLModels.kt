@@ -126,12 +126,23 @@ data class ApplicationsForUserResponse(
     @Serializable
     data class Application(
         val name: String,
-        val ingresses: List<Ingress>
+        val ingresses: List<Ingress>,
+        val deployments: Deployments
     )
 
     @Serializable
     data class Ingress(
         val type: String
+    )
+
+    @Serializable
+    data class Deployments(
+        val nodes: List<Deployment>
+    )
+
+    @Serializable
+    data class Deployment(
+        val environmentName: String
     )
 
     @Serializable

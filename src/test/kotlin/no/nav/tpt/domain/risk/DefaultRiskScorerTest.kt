@@ -16,7 +16,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = true,
                 epssScore = "0.9",
-                suppressed = true
+                suppressed = true,
+                environment = null
             )
         )
 
@@ -26,7 +27,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = true,
                 epssScore = "0.9",
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -42,7 +44,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -52,7 +55,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -70,7 +74,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -85,7 +90,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("INTERNAL"),
                 hasKevEntry = true,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -95,7 +101,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("INTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -110,7 +117,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("INTERNAL"),
                 hasKevEntry = false,
                 epssScore = "0.8",
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -120,7 +128,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("INTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -140,7 +149,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = true,
                 epssScore = "0.8",
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -156,7 +166,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -166,7 +177,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("INTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -181,7 +193,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -191,7 +204,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("AUTHENTICATED"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -206,7 +220,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = "0.05",
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -216,7 +231,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -231,7 +247,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("INTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -241,7 +258,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = emptyList(),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -256,7 +274,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = "invalid",
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -271,7 +290,8 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("INTERNAL", "EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
@@ -281,11 +301,113 @@ class DefaultRiskScorerTest {
                 ingressTypes = listOf("EXTERNAL"),
                 hasKevEntry = false,
                 epssScore = null,
-                suppressed = false
+                suppressed = false,
+                environment = null
             )
         )
 
         assertEquals(externalOnly, mixed)
+    }
+
+    @Test
+    fun `should apply 1_1 multiplier for prod-gcp environment`() {
+        val prodScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "HIGH",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = "prod-gcp"
+            )
+        )
+
+        val devScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "HIGH",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = "dev-gcp"
+            )
+        )
+
+        assertEquals(1.1, prodScore / devScore, 0.001)
+    }
+
+    @Test
+    fun `should apply 1_1 multiplier for prod-fss environment`() {
+        val prodScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "MEDIUM",
+                ingressTypes = listOf("INTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = "prod-fss"
+            )
+        )
+
+        val devScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "MEDIUM",
+                ingressTypes = listOf("INTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = "dev-fss"
+            )
+        )
+
+        assertEquals(1.1, prodScore / devScore, 0.001)
+    }
+
+    @Test
+    fun `should not apply multiplier for dev environments`() {
+        val devGcpScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "CRITICAL",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = "dev-gcp"
+            )
+        )
+
+        val noEnvScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "CRITICAL",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null
+            )
+        )
+
+        assertEquals(devGcpScore, noEnvScore)
+    }
+
+    @Test
+    fun `should not apply multiplier for null environment`() {
+        val score = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "HIGH",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null
+            )
+        )
+
+        val baseScore = 70.0
+        val externalMultiplier = 2.0
+        val expected = baseScore * externalMultiplier
+
+        assertEquals(expected, score)
     }
 }
 

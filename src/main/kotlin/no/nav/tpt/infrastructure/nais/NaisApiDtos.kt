@@ -2,7 +2,8 @@ package no.nav.tpt.infrastructure.nais
 
 data class ApplicationData(
     val name: String,
-    val ingressTypes: List<IngressType>
+    val ingressTypes: List<IngressType>,
+    val environment: String?
 )
 
 data class TeamApplicationsData(

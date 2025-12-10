@@ -8,8 +8,9 @@ class DefaultRiskScorer : RiskScorer {
         val kevMultiplier = getKevMultiplier(context.hasKevEntry)
         val epssMultiplier = getEpssMultiplier(context.epssScore)
         val suppressedMultiplier = if (context.suppressed) 0.3 else 1.0
+        val environmentMultiplier = getEnvironmentMultiplier(context.environment)
 
-        return baseScore * exposureMultiplier * kevMultiplier * epssMultiplier * suppressedMultiplier
+        return baseScore * exposureMultiplier * kevMultiplier * epssMultiplier * suppressedMultiplier * environmentMultiplier
     }
 
     private fun getBaseSeverityScore(severity: String): Double {
@@ -59,6 +60,17 @@ class DefaultRiskScorer : RiskScorer {
             }
         } catch (_: NumberFormatException) {
             1.0
+        }
+    }
+
+    private fun getEnvironmentMultiplier(environment: String?): Double {
+        if (environment == null) {
+            return 1.0
+        }
+
+        return when {
+            environment.startsWith("prod-", ignoreCase = true) -> 1.1
+            else -> 1.0
         }
     }
 }

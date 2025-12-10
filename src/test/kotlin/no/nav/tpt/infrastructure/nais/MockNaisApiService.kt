@@ -18,7 +18,8 @@ class MockNaisApiService(
             applications = listOf(
                 ApplicationData(
                     name = "test-app",
-                    ingressTypes = listOf(IngressType.INTERNAL)
+                    ingressTypes = listOf(IngressType.INTERNAL),
+                    environment = null
                 )
             )
         )
@@ -43,7 +44,8 @@ class MockNaisApiService(
                     applications = listOf(
                         ApplicationData(
                             name = appName,
-                            ingressTypes = listOf(IngressType.INTERNAL)
+                            ingressTypes = listOf(IngressType.INTERNAL),
+                            environment = null
                         )
                     )
                 )

@@ -19,8 +19,8 @@ class VulnServiceTest {
                     TeamApplicationsData(
                         teamSlug = "team-alpha",
                         applications = listOf(
-                            ApplicationData(name = "app1", ingressTypes = listOf(IngressType.INTERNAL, IngressType.EXTERNAL)),
-                            ApplicationData(name = "app2", ingressTypes = listOf(IngressType.INTERNAL))
+                            ApplicationData(name = "app1", ingressTypes = listOf(IngressType.INTERNAL, IngressType.EXTERNAL), environment = "prod"),
+                            ApplicationData(name = "app2", ingressTypes = listOf(IngressType.INTERNAL), environment = "dev")
                         )
                     )
                 )
@@ -113,7 +113,7 @@ class VulnServiceTest {
                     TeamApplicationsData(
                         teamSlug = "team-beta",
                         applications = listOf(
-                            ApplicationData(name = "app1", ingressTypes = listOf(IngressType.INTERNAL))
+                            ApplicationData(name = "app1", ingressTypes = listOf(IngressType.INTERNAL), environment = null)
                         )
                     )
                 )
@@ -237,13 +237,13 @@ class VulnServiceTest {
                     TeamApplicationsData(
                         teamSlug = "team-one",
                         applications = listOf(
-                            ApplicationData(name = "app-a", ingressTypes = listOf(IngressType.EXTERNAL))
+                            ApplicationData(name = "app-a", ingressTypes = listOf(IngressType.EXTERNAL), environment = "prod")
                         )
                     ),
                     TeamApplicationsData(
                         teamSlug = "team-two",
                         applications = listOf(
-                            ApplicationData(name = "app-b", ingressTypes = listOf(IngressType.INTERNAL))
+                            ApplicationData(name = "app-b", ingressTypes = listOf(IngressType.INTERNAL), environment = "dev")
                         )
                     )
                 )
