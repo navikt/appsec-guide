@@ -130,26 +130,37 @@ components:
     VulnVulnerabilityDto:
       type: object
       required:
-        - suppressed
+        - identifier
         - riskScore
-        - riskScoreReason
+        - riskScoreMultipliers
       properties:
+        identifier:
+          type: string
+          description: Vulnerability identifier (e.g., CVE-2024-1234)
+          example: "CVE-2024-1234"
         packageName:
           type: string
           nullable: true
           description: Package name affected by the vulnerability
-        suppressed:
-          type: boolean
-          description: Whether the vulnerability has been suppressed
         riskScore:
           type: number
           format: double
-          description: Calculated risk score using multiplier-based system. Base severity score multiplied by exposure (ingress type), KEV presence, EPSS probability, and suppression status. Higher scores indicate higher priority vulnerabilities.
+          description: Calculated risk score using multiplier-based system. Base severity score multiplied by exposure (ingress type), KEV presence, EPSS probability, suppression status, environment, and build age. Higher scores indicate higher priority vulnerabilities.
           example: 300.0
-        riskScoreReason:
-          type: string
-          description: Human-readable explanation of how the risk score was calculated, showing the base score and all multipliers applied
-          example: "Base: HIGH severity (70), External exposure (×2.0), CISA KEV listed (×1.5), EPSS 45% (×1.2), Production environment (×1.1) = 277"
+        riskScoreMultipliers:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          description: Map of multipliers used in risk score calculation. Keys include base severity (e.g., base_high), exposure, kev, epss, suppressed, production, old_build_days, old_build. Only includes multipliers that were applied (excludes 1.0 values and missing data).
+          example:
+            base_high: 70.0
+            exposure: 2.0
+            kev: 1.5
+            epss: 1.2
+            production: 1.1
+            old_build_days: 120.0
+            old_build: 1.1
     ProblemDetail:
       type: object
       required:

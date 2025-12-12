@@ -1,5 +1,6 @@
 package no.nav.tpt.domain.risk
 
+import org.junit.Assert.assertFalse
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -17,7 +18,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = true,
                 epssScore = "0.9",
                 suppressed = true,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -28,7 +30,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = true,
                 epssScore = "0.9",
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -45,7 +48,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -56,7 +60,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -75,7 +80,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -91,7 +97,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = true,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -102,7 +109,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -118,7 +126,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = "0.8",
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -129,7 +138,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -150,7 +160,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = true,
                 epssScore = "0.8",
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -167,7 +178,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -178,7 +190,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -194,7 +207,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -205,7 +219,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -221,7 +236,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = "0.05",
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -232,7 +248,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -248,7 +265,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -259,7 +277,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -275,7 +294,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = "invalid",
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -291,7 +311,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -302,7 +323,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -318,7 +340,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = "prod-gcp"
+                environment = "prod-gcp",
+                buildDate = null
             )
         ).score
 
@@ -329,7 +352,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = "dev-gcp"
+                environment = "dev-gcp",
+                buildDate = null
             )
         ).score
 
@@ -345,7 +369,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = "prod-fss"
+                environment = "prod-fss",
+                buildDate = null
             )
         ).score
 
@@ -356,7 +381,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = "dev-fss"
+                environment = "dev-fss",
+                buildDate = null
             )
         ).score
 
@@ -372,7 +398,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = "dev-gcp"
+                environment = "dev-gcp",
+                buildDate = null
             )
         ).score
 
@@ -383,7 +410,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -399,7 +427,8 @@ class DefaultRiskScorerTest {
                 hasKevEntry = false,
                 epssScore = null,
                 suppressed = false,
-                environment = null
+                environment = null,
+                buildDate = null
             )
         ).score
 
@@ -408,6 +437,132 @@ class DefaultRiskScorerTest {
         val expected = baseScore * externalMultiplier
 
         assertEquals(expected, score, 0.001)
+    }
+
+    @Test
+    fun `should apply 1_1 multiplier for old builds`() {
+        val oldBuildDate = java.time.LocalDate.now().minusDays(100)
+
+        val oldBuildScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "HIGH",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null,
+                buildDate = oldBuildDate
+            )
+        ).score
+
+        val recentBuildScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "HIGH",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null,
+                buildDate = java.time.LocalDate.now().minusDays(30)
+            )
+        ).score
+
+        assertEquals(1.1, oldBuildScore / recentBuildScore, 0.001)
+    }
+
+    @Test
+    fun `should not apply multiplier for recent builds`() {
+        val recentBuildScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "CRITICAL",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null,
+                buildDate = java.time.LocalDate.now().minusDays(30)
+            )
+        ).score
+
+        val noBuildDateScore = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "CRITICAL",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null,
+                buildDate = null
+            )
+        ).score
+
+        assertEquals(recentBuildScore, noBuildDateScore)
+    }
+
+    @Test
+    fun `should apply multiplier at 90 day threshold`() {
+        val atThreshold = java.time.LocalDate.now().minusDays(91)
+
+        val score = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "MEDIUM",
+                ingressTypes = listOf("INTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null,
+                buildDate = atThreshold
+            )
+        ).score
+
+        val baseScore = 40.0
+        val internalMultiplier = 1.0
+        val oldBuildMultiplier = 1.1
+        val expected = baseScore * internalMultiplier * oldBuildMultiplier
+
+        assertEquals(expected, score, 0.001)
+    }
+
+    @Test
+    fun `should include build age in multipliers when old`() {
+        val oldBuildDate = java.time.LocalDate.now().minusDays(120)
+
+        val result = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "HIGH",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null,
+                buildDate = oldBuildDate
+            )
+        )
+
+        assertTrue(result.multipliers.containsKey("old_build"))
+        assertTrue(result.multipliers.containsKey("old_build_days"))
+        assertEquals(1.1, result.multipliers["old_build"])
+        assertEquals(120.0, result.multipliers["old_build_days"])
+    }
+
+    @Test
+    fun `should not include build age in multipliers when recent`() {
+        val recentBuildDate = java.time.LocalDate.now().minusDays(30)
+
+        val result = riskScorer.calculateRiskScore(
+            VulnerabilityRiskContext(
+                severity = "HIGH",
+                ingressTypes = listOf("EXTERNAL"),
+                hasKevEntry = false,
+                epssScore = null,
+                suppressed = false,
+                environment = null,
+                buildDate = recentBuildDate
+            )
+        )
+
+        assertFalse(result.multipliers.containsKey("old_build"))
+        assertFalse(result.multipliers.containsKey("old_build_days"))
     }
 }
 

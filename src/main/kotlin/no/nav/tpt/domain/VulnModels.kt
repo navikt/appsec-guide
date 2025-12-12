@@ -24,8 +24,8 @@ data class VulnWorkloadDto(
 
 @Serializable
 data class VulnVulnerabilityDto(
+    val identifier: String,
     val packageName: String?,
-    val suppressed: Boolean,
     val riskScore: Double,
-    val riskScoreReason: String
+    val riskScoreMultipliers: Map<String, Double>
 )

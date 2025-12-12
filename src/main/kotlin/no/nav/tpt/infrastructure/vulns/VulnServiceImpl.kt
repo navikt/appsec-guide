@@ -7,6 +7,7 @@ import no.nav.tpt.domain.VulnWorkloadDto
 import no.nav.tpt.domain.risk.RiskScorer
 import no.nav.tpt.infrastructure.cisa.KevService
 import no.nav.tpt.infrastructure.epss.EpssService
+import no.nav.tpt.infrastructure.nais.ImageTagParser
 import no.nav.tpt.infrastructure.nais.NaisApiService
 
 class VulnServiceImpl(
@@ -44,6 +45,9 @@ class VulnServiceImpl(
                 val app = appMap[workload.name]
                 val ingressTypes = app?.ingressTypes?.map { it.name } ?: emptyList()
                 val environment = app?.environment
+                val buildDate = workload.imageTag?.let { tag ->
+                    ImageTagParser.extractBuildDate(tag)
+                }
 
                 val vulnerabilities = workload.vulnerabilities.map { vuln ->
                     val epssScore = epssScores[vuln.identifier]
@@ -55,15 +59,16 @@ class VulnServiceImpl(
                         hasKevEntry = hasKevEntry,
                         epssScore = epssScore?.epss,
                         suppressed = vuln.suppressed,
-                        environment = environment
+                        environment = environment,
+                        buildDate = buildDate
                     )
                     val riskResult = riskScorer.calculateRiskScore(riskContext)
 
                     VulnVulnerabilityDto(
+                        identifier = vuln.identifier,
                         packageName = vuln.packageName,
-                        suppressed = vuln.suppressed,
                         riskScore = riskResult.score,
-                        riskScoreReason = riskResult.reason
+                        riskScoreMultipliers = riskResult.multipliers
                     )
                 }
 
@@ -93,4 +98,3 @@ class VulnServiceImpl(
         return VulnResponse(teams = teams)
     }
 }
-

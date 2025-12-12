@@ -92,13 +92,7 @@ class VulnServiceTest {
         assertEquals("app1", result.teams[0].workloads[0].name)
         assertEquals(2, result.teams[0].workloads[0].vulnerabilities.size)
         assertTrue(result.teams[0].workloads[0].vulnerabilities[0].riskScore > 0)
-        assertTrue(result.teams[0].workloads[0].vulnerabilities[0].riskScoreReason.isNotEmpty())
-
-        val highVuln = result.teams[0].workloads[0].vulnerabilities[0]
-        assertFalse(highVuln.suppressed)
-
-        val mediumVuln = result.teams[0].workloads[0].vulnerabilities[1]
-        assertTrue(mediumVuln.suppressed)
+        assertTrue(result.teams[0].workloads[0].vulnerabilities[0].riskScoreMultipliers.isNotEmpty())
     }
 
     @Test
