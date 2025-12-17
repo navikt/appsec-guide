@@ -4,12 +4,14 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import org.slf4j.LoggerFactory
 
 class NaisApiClient(
     private val httpClient: HttpClient,
     private val apiUrl: String,
     private val token: String
 ) {
+    private val logger = LoggerFactory.getLogger(NaisApiClient::class.java)
 
     private val applicationsForTeamQuery = this::class.java.classLoader
         .getResource("graphql/applications-for-team.graphql")
@@ -50,15 +52,21 @@ class NaisApiClient(
         while (hasNextPage) {
             val request = createApplicationsForTeamRequest(teamSlug, cursor)
 
-            val response = httpClient.post(apiUrl) {
-                contentType(ContentType.Application.Json)
-                bearerAuth(token)
-                setBody(request)
+            val response = try {
+                httpClient.post(apiUrl) {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(token)
+                    setBody(request)
+                }
+            } catch (e: Exception) {
+                logger.error("HTTP error fetching applications for team $teamSlug", e)
+                throw e
             }
 
             val pageResponse: ApplicationsForTeamResponse = response.body()
 
             if (pageResponse.errors != null && pageResponse.errors.isNotEmpty()) {
+                logger.error("GraphQL errors for team $teamSlug: ${pageResponse.errors.joinToString { "${it.message} at ${it.path}" }}")
                 return pageResponse
             }
 
@@ -114,15 +122,21 @@ class NaisApiClient(
         while (hasNextPage) {
             val request = createApplicationsForUserRequest(email, cursor)
 
-            val response = httpClient.post(apiUrl) {
-                contentType(ContentType.Application.Json)
-                bearerAuth(token)
-                setBody(request)
+            val response = try {
+                httpClient.post(apiUrl) {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(token)
+                    setBody(request)
+                }
+            } catch (e: Exception) {
+                logger.error("HTTP error fetching applications for user $email", e)
+                throw e
             }
 
             val pageResponse: ApplicationsForUserResponse = response.body()
 
             if (pageResponse.errors != null && pageResponse.errors.isNotEmpty()) {
+                logger.error("GraphQL errors for user $email: ${pageResponse.errors.joinToString { "${it.message} at ${it.path}" }}")
                 return pageResponse
             }
 
@@ -201,13 +215,24 @@ class NaisApiClient(
             )
         )
 
-        val response = httpClient.post(apiUrl) {
-            contentType(ContentType.Application.Json)
-            bearerAuth(token)
-            setBody(request)
+        val response = try {
+            httpClient.post(apiUrl) {
+                contentType(ContentType.Application.Json)
+                bearerAuth(token)
+                setBody(request)
+            }
+        } catch (e: Exception) {
+            logger.error("HTTP error fetching vulnerabilities for team $teamSlug", e)
+            throw e
         }
 
-        return response.body()
+        val result: VulnerabilitiesForTeamResponse = response.body()
+
+        if (result.errors != null && result.errors.isNotEmpty()) {
+            logger.error("GraphQL errors for team vulnerabilities $teamSlug: ${result.errors.joinToString { "${it.message} at ${it.path}" }}")
+        }
+
+        return result
     }
 
     suspend fun getVulnerabilitiesForUser(email: String): VulnerabilitiesForUserResponse {
@@ -226,15 +251,21 @@ class NaisApiClient(
                 )
             )
 
-            val response = httpClient.post(apiUrl) {
-                contentType(ContentType.Application.Json)
-                bearerAuth(token)
-                setBody(request)
+            val response = try {
+                httpClient.post(apiUrl) {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(token)
+                    setBody(request)
+                }
+            } catch (e: Exception) {
+                logger.error("HTTP error fetching vulnerabilities for user $email", e)
+                throw e
             }
 
             val pageResponse: VulnerabilitiesForUserResponse = response.body()
 
             if (pageResponse.errors != null && pageResponse.errors.isNotEmpty()) {
+                logger.error("GraphQL errors for user vulnerabilities $email: ${pageResponse.errors.joinToString { "${it.message} at ${it.path}" }}")
                 return pageResponse
             }
 

@@ -22,7 +22,7 @@ class CachedNaisApiService(
         val response = apiClient.getApplicationsForTeam(teamSlug)
 
         if (response.errors != null && response.errors.isNotEmpty()) {
-            logger.warn("Not caching error response for team: $teamSlug")
+            logger.warn("GraphQL errors for team $teamSlug: ${response.errors.joinToString { "${it.message} at ${it.path}" }}")
         } else {
             val jsonString = json.encodeToString(ApplicationsForTeamResponse.serializer(), response)
             cache.put(cacheKey, jsonString)
@@ -42,7 +42,7 @@ class CachedNaisApiService(
         val response = apiClient.getApplicationsForUser(email)
 
         if (response.errors != null && response.errors.isNotEmpty()) {
-            logger.warn("Not caching error response for user: $email")
+            logger.warn("GraphQL errors for user $email: ${response.errors.joinToString { "${it.message} at ${it.path}" }}")
         } else {
             val jsonString = json.encodeToString(ApplicationsForUserResponse.serializer(), response)
             cache.put(cacheKey, jsonString)
@@ -62,7 +62,7 @@ class CachedNaisApiService(
         val response = apiClient.getVulnerabilitiesForTeam(teamSlug)
 
         if (response.errors != null && response.errors.isNotEmpty()) {
-            logger.warn("Not caching error response for team vulnerabilities: $teamSlug")
+            logger.warn("GraphQL errors for team vulnerabilities $teamSlug: ${response.errors.joinToString { "${it.message} at ${it.path}" }}")
         } else {
             val jsonString = json.encodeToString(VulnerabilitiesForTeamResponse.serializer(), response)
             cache.put(cacheKey, jsonString)
@@ -82,7 +82,7 @@ class CachedNaisApiService(
         val response = apiClient.getVulnerabilitiesForUser(email)
 
         if (response.errors != null && response.errors.isNotEmpty()) {
-            logger.warn("Not caching error response for user vulnerabilities: $email")
+            logger.warn("GraphQL errors for user vulnerabilities $email: ${response.errors.joinToString { "${it.message} at ${it.path}" }}")
         } else {
             val jsonString = json.encodeToString(VulnerabilitiesForUserResponse.serializer(), response)
             cache.put(cacheKey, jsonString)

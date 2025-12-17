@@ -4,6 +4,9 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import no.nav.tpt.domain.ProblemDetail
+import org.slf4j.LoggerFactory
+
+private val logger = LoggerFactory.getLogger("no.nav.tpt.routes.ResponseHelpers")
 
 suspend fun ApplicationCall.respondBadRequest(detail: String) {
     respond(
@@ -32,6 +35,7 @@ suspend fun ApplicationCall.respondUnauthorized(detail: String) {
 }
 
 suspend fun ApplicationCall.respondInternalServerError(errorContext: String, exception: Exception) {
+    logger.error("$errorContext for request ${request.local.method.value} ${request.local.uri}", exception)
     respond(
         HttpStatusCode.InternalServerError,
         ProblemDetail(
