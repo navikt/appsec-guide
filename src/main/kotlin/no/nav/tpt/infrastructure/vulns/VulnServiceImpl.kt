@@ -67,6 +67,8 @@ class VulnServiceImpl(
                     VulnVulnerabilityDto(
                         identifier = vuln.identifier,
                         packageName = vuln.packageName,
+                        description = vuln.description,
+                        vulnerabilityDetailsLink = vuln.vulnerabilityDetailsLink,
                         riskScore = riskResult.score,
                         riskScoreMultipliers = riskResult.multipliers
                     )

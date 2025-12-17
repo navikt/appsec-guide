@@ -40,12 +40,16 @@ class VulnServiceTest {
                                         identifier = "CVE-2023-12345",
                                         severity = "HIGH",
                                         packageName = null,
+                                        description = null,
+                                        vulnerabilityDetailsLink = null,
                                         suppressed = false
                                     ),
                                     VulnerabilityData(
                                         identifier = "CVE-2023-54321",
                                         severity = "MEDIUM",
                                         packageName = null,
+                                        description = null,
+                                        vulnerabilityDetailsLink = null,
                                         suppressed = true
                                     )
                                 )
@@ -191,6 +195,8 @@ class VulnServiceTest {
                                         identifier = "CVE-2023-99999",
                                         severity = "CRITICAL",
                                         packageName = null,
+                                        description = null,
+                                        vulnerabilityDetailsLink = null,
                                         suppressed = false
                                     )
                                 )
@@ -255,6 +261,8 @@ class VulnServiceTest {
                                         identifier = "CVE-2023-11111",
                                         severity = "LOW",
                                         packageName = null,
+                                        description = null,
+                                        vulnerabilityDetailsLink = null,
                                         suppressed = false
                                     )
                                 )
@@ -274,6 +282,8 @@ class VulnServiceTest {
                                         identifier = "CVE-2023-22222",
                                         severity = "HIGH",
                                         packageName = null,
+                                        description = null,
+                                        vulnerabilityDetailsLink = null,
                                         suppressed = false
                                     )
                                 )

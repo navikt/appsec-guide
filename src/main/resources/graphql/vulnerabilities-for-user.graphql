@@ -1,6 +1,6 @@
 query VulnerabilitiesForUser($email: String!, $workloadFirst: Int = 50, $workloadAfter: Cursor, $vulnFirst: Int = 50, $vulnAfter: Cursor) {
   user(email: $email) {
-    teams {
+    teams(first: 2) {
       nodes {
         team {
           slug
@@ -12,11 +12,6 @@ query VulnerabilitiesForUser($email: String!, $workloadFirst: Int = 50, $workloa
             nodes {
               id
               name
-              deployments(first: 1) {
-                nodes {
-                  repository
-                }
-              }
               image {
                 name
                 tag
@@ -27,8 +22,9 @@ query VulnerabilitiesForUser($email: String!, $workloadFirst: Int = 50, $workloa
                   }
                   nodes {
                     identifier
+                    description
+                    vulnerabilityDetailsLink
                     severity
-                    package
                     suppression {
                       state
                     }

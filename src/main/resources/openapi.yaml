@@ -142,6 +142,16 @@ components:
           type: string
           nullable: true
           description: Package name affected by the vulnerability
+        description:
+          type: string
+          nullable: true
+          description: Human-readable description of the vulnerability
+          example: "A buffer overflow vulnerability in the X.509 certificate parser could allow remote code execution"
+        vulnerabilityDetailsLink:
+          type: string
+          nullable: true
+          description: URL to detailed information about the vulnerability
+          example: "https://nvd.nist.gov/vuln/detail/CVE-2024-1234"
         riskScore:
           type: number
           format: double

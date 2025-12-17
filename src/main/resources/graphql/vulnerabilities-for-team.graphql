@@ -23,6 +23,8 @@ query VulnerabilitiesForTeam($teamSlug: Slug!, $workloadFirst: Int = 50, $worklo
             }
             nodes {
               identifier
+              description
+              vulnerabilityDetailsLink
               severity
               package
               suppression {

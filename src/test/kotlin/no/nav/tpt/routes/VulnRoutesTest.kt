@@ -56,6 +56,8 @@ class VulnRoutesTest {
                                         identifier = "CVE-2023-12345",
                                         severity = "HIGH",
                                         packageName = null,
+                                        description = null,
+                                        vulnerabilityDetailsLink = null,
                                         suppressed = false
                                     )
                                 )
@@ -264,7 +266,7 @@ class VulnRoutesTest {
                                 imageTag = null,
                                 repository = null,
                                 vulnerabilities = listOf(
-                                    VulnerabilityData(identifier = "CVE-2023-11111", severity = "LOW", packageName = null, suppressed = false)
+                                    VulnerabilityData(identifier = "CVE-2023-11111", severity = "LOW", packageName = null, description = null, vulnerabilityDetailsLink = null, suppressed = false)
                                 )
                             )
                         )
@@ -278,7 +280,7 @@ class VulnRoutesTest {
                                 imageTag = null,
                                 repository = null,
                                 vulnerabilities = listOf(
-                                    VulnerabilityData(identifier = "CVE-2023-22222", severity = "HIGH", packageName = null, suppressed = false)
+                                    VulnerabilityData(identifier = "CVE-2023-22222", severity = "HIGH", packageName = null, description = null, vulnerabilityDetailsLink = null, suppressed = false)
                                 )
                             )
                         )

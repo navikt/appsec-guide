@@ -232,6 +232,8 @@ data class VulnerabilitiesForTeamResponse(
         val severity: String,
         @SerialName("package")
         val packageName: String?,
+        val description: String?,
+        val vulnerabilityDetailsLink: String?,
         val suppression: Suppression?
     )
 
@@ -342,6 +344,8 @@ data class VulnerabilitiesForUserResponse(
         val severity: String,
         @SerialName("package")
         val packageName: String?,
+        val description: String?,
+        val vulnerabilityDetailsLink: String?,
         val suppression: Suppression?
     )
 

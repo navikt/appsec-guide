@@ -26,6 +26,8 @@ data class VulnWorkloadDto(
 data class VulnVulnerabilityDto(
     val identifier: String,
     val packageName: String?,
+    val description: String?,
+    val vulnerabilityDetailsLink: String?,
     val riskScore: Double,
     val riskScoreMultipliers: Map<String, Double>
 )

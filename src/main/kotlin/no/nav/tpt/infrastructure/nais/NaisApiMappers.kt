@@ -40,6 +40,8 @@ internal fun VulnerabilitiesForTeamResponse.toData(teamSlug: String): TeamVulner
                 identifier = vuln.identifier,
                 severity = vuln.severity,
                 packageName = vuln.packageName,
+                description = vuln.description,
+                vulnerabilityDetailsLink = vuln.vulnerabilityDetailsLink,
                 suppressed = vuln.suppression?.state == "SUPPRESSED"
             )
         }?.distinct() ?: emptyList()
@@ -67,6 +69,8 @@ internal fun VulnerabilitiesForUserResponse.toData(): UserVulnerabilitiesData {
                     identifier = vuln.identifier,
                     severity = vuln.severity,
                     packageName = vuln.packageName,
+                    description = vuln.description,
+                    vulnerabilityDetailsLink = vuln.vulnerabilityDetailsLink,
                     suppressed = vuln.suppression?.state == "SUPPRESSED"
                 )
             }?.distinct() ?: emptyList()

@@ -71,6 +71,8 @@ class MockNaisApiService(
                             identifier = "CVE-2023-12345",
                             severity = "HIGH",
                             packageName = null,
+                            description = null,
+                            vulnerabilityDetailsLink = null,
                             suppressed = false
                         )
                     )
@@ -99,6 +101,8 @@ class MockNaisApiService(
                                     identifier = "CVE-2023-12345",
                                     severity = "HIGH",
                                     packageName = null,
+                                    description = null,
+                                    vulnerabilityDetailsLink = null,
                                     suppressed = false
                                 )
                             )

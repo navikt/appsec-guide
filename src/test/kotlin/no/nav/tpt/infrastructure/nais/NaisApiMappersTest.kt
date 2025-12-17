@@ -33,18 +33,24 @@ class NaisApiMappersTest {
                                                 identifier = "CVE-2023-1234",
                                                 severity = "HIGH",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             ),
                                             VulnerabilitiesForTeamResponse.Vulnerability(
                                                 identifier = "CVE-2023-1234",
                                                 severity = "HIGH",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             ),
                                             VulnerabilitiesForTeamResponse.Vulnerability(
                                                 identifier = "CVE-2023-5678",
                                                 severity = "MEDIUM",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             )
                                         )
@@ -99,18 +105,24 @@ class NaisApiMappersTest {
                                                                 identifier = "CVE-2023-1234",
                                                                 severity = "HIGH",
                                                                 packageName = null,
+                                                                description = null,
+                                                                vulnerabilityDetailsLink = null,
                                                                 suppression = null
                                                             ),
                                                             VulnerabilitiesForUserResponse.Vulnerability(
                                                                 identifier = "CVE-2023-1234",
                                                                 severity = "CRITICAL",
                                                                 packageName = null,
+                                                                description = null,
+                                                                vulnerabilityDetailsLink = null,
                                                                 suppression = null
                                                             ),
                                                             VulnerabilitiesForUserResponse.Vulnerability(
                                                                 identifier = "CVE-2023-9999",
                                                                 severity = "LOW",
                                                                 packageName = null,
+                                                                description = null,
+                                                                vulnerabilityDetailsLink = null,
                                                                 suppression = null
                                                             )
                                                         )
@@ -168,12 +180,16 @@ class NaisApiMappersTest {
                                                 identifier = "CVE-2023-1234",
                                                 severity = "HIGH",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             ),
                                             VulnerabilitiesForTeamResponse.Vulnerability(
                                                 identifier = "CVE-2023-1234",
                                                 severity = "MEDIUM",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = VulnerabilitiesForTeamResponse.Suppression(
                                                     state = "SUPPRESSED"
                                                 )
@@ -268,12 +284,16 @@ class NaisApiMappersTest {
                                                 identifier = "CVE-2023-1111",
                                                 severity = "HIGH",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             ),
                                             VulnerabilitiesForTeamResponse.Vulnerability(
                                                 identifier = "CVE-2023-1111",
                                                 severity = "HIGH",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             )
                                         )
@@ -297,18 +317,24 @@ class NaisApiMappersTest {
                                                 identifier = "CVE-2023-2222",
                                                 severity = "CRITICAL",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             ),
                                             VulnerabilitiesForTeamResponse.Vulnerability(
                                                 identifier = "CVE-2023-2222",
                                                 severity = "CRITICAL",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             ),
                                             VulnerabilitiesForTeamResponse.Vulnerability(
                                                 identifier = "CVE-2023-3333",
                                                 severity = "LOW",
                                                 packageName = null,
+                                                description = null,
+                                                vulnerabilityDetailsLink = null,
                                                 suppression = null
                                             )
                                         )

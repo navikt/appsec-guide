@@ -19,6 +19,8 @@ data class VulnerabilityData(
     val identifier: String,
     val severity: String,
     val packageName: String?,
+    val description: String?,
+    val vulnerabilityDetailsLink: String?,
     val suppressed: Boolean
 )
 
