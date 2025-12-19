@@ -12,6 +12,7 @@ import io.ktor.server.request.*
 import kotlinx.serialization.json.Json
 import no.nav.tpt.plugins.DependenciesPlugin
 import no.nav.tpt.plugins.configureAuthentication
+import no.nav.tpt.plugins.configureNvdSync
 import no.nav.tpt.plugins.dependencies
 import no.nav.tpt.routes.healthRoutes
 import no.nav.tpt.routes.vulnRoutes
@@ -46,6 +47,7 @@ fun Application.module() {
     }
 
     configureAuthentication(dependencies.tokenIntrospectionService)
+    configureNvdSync()
 
     routing {
         swaggerUI(path = "swagger", swaggerFile = "openapi.yaml")

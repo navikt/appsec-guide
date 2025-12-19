@@ -13,8 +13,10 @@ import no.nav.tpt.infrastructure.cache.ValkeyCache
 import no.nav.tpt.infrastructure.cache.ValkeyClientFactory
 import no.nav.tpt.infrastructure.cisa.*
 import no.nav.tpt.infrastructure.config.AppConfig
+import no.nav.tpt.infrastructure.database.DatabaseFactory
 import no.nav.tpt.infrastructure.epss.*
 import no.nav.tpt.infrastructure.nais.*
+import no.nav.tpt.infrastructure.nvd.*
 import no.nav.tpt.infrastructure.vulns.VulnService
 import no.nav.tpt.infrastructure.vulns.VulnServiceImpl
 import kotlin.time.Duration.Companion.minutes
@@ -26,6 +28,8 @@ class Dependencies(
     val naisApiService: NaisApiService,
     val kevService: KevService,
     val epssService: EpssService,
+    val nvdRepository: NvdRepository,
+    val nvdSyncService: NvdSyncService,
     val httpClient: HttpClient,
     val vulnService: VulnService
 )
@@ -91,6 +95,11 @@ val DependenciesPlugin = createApplicationPlugin(name = "Dependencies") {
     )
     val epssService = CachedEpssService(epssClient, epssCache, epssCircuitBreaker)
 
+    val database = DatabaseFactory.init(config)
+    val nvdClient = NvdClient(httpClient, config.nvdApiKey)
+    val nvdRepository = NvdRepositoryImpl(database)
+    val nvdSyncService = NvdSyncService(nvdClient, nvdRepository)
+
     val riskScorer = no.nav.tpt.domain.risk.DefaultRiskScorer()
     val vulnService = VulnServiceImpl(naisApiService, kevService, epssService, riskScorer)
 
@@ -100,6 +109,8 @@ val DependenciesPlugin = createApplicationPlugin(name = "Dependencies") {
         naisApiService = naisApiService,
         kevService = kevService,
         epssService = epssService,
+        nvdRepository = nvdRepository,
+        nvdSyncService = nvdSyncService,
         httpClient = httpClient,
         vulnService = vulnService
     )

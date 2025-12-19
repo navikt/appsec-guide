@@ -1,22 +1,26 @@
 # Titt-På-Ting Backend
 
-API to help developers prioritize which security issues to fix first. Fetches vulnerability data from NAIS, enriches with CISA KEV catalog, and returns prioritized results.
+API to help developers prioritize which security issues to fix first. Fetches vulnerability data from NAIS, enriches with external data, and returns prioritized results.
 
 ## Prerequisites
-- Java 21
-- Gradle 8.x
-- Docker (for Valkey cache in tests)
+- Java 25
+- Gradle 9.x
+- Docker (for Valkey cache and postgresql in tests)
 
 ## Environment Variables
 
 - `NAIS_TOKEN_INTROSPECTION_ENDPOINT` - Token introspection endpoint (required)
 - `NAIS_API_URL` - NAIS GraphQL API endpoint (required)
 - `NAIS_API_TOKEN` - NAIS API token (required)
+- `NAIS_DATABASE_TPT_BACKEND_MYDB_JDBC_URL` - PostgreSQL JDBC URL (auto-injected by NAIS)
+- `NVD_API_KEY` - NVD API key for higher rate limits (optional)
 - `VALKEY_HOST` - Valkey host (default: localhost)
 - `VALKEY_PORT` - Valkey port (default: 6379)
 - `VALKEY_USERNAME` - Valkey username (optional)
 - `VALKEY_PASSWORD` - Valkey password (optional)
 - `CACHE_TTL_MINUTES` - Cache TTL in minutes (default: 60)
+
+Request NVD Api key at [NIST](https://nvd.nist.gov/developers/request-an-api-key) and subscribe to [NVD Technical Updates](https://www.nist.gov/itl/nvd).
 
 ## Running Locally
 
@@ -35,7 +39,16 @@ Application starts on `http://localhost:8080`
 ./gradlew test
 ```
 
-Tests use mocked dependencies and testcontainers for Valkey.
+Tests use mocked dependencies and testcontainers for Valkey and PostgreSQL.
+
+## Data Sources
+
+- **NAIS API** - Vulnerability data and application metadata
+- **NVD** - National Vulnerability Database (PostgreSQL-backed, syncs every 2 hours)
+- **CISA KEV** - Known Exploited Vulnerabilities catalog (Valkey-cached)
+- **EPSS** - Exploit Prediction Scoring System (Valkey-cached)
+
+Initial NVD sync takes ~12-15 hours on first deployment.
 
 ## API Endpoints
 

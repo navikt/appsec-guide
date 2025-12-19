@@ -23,6 +23,7 @@ repositories {
 dependencies {
     implementation(libs.bundles.ktor)
     implementation(libs.bundles.logging)
+    implementation(libs.bundles.database)
     implementation(libs.valkey.java)
     implementation(libs.jakarta.validation.api)
 
