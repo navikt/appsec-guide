@@ -54,7 +54,7 @@ class NvdRepositoryImpl(private val database: Database) : NvdRepository {
                         it[cvssV2Score] = cveData.cvssV2Score?.toBigDecimal()
                         it[cvssV2Severity] = cveData.cvssV2Severity
                         it[description] = cveData.description
-                        it[references] = json.encodeToString<List<String>>(cveData.references)
+                        it[nvdReferences] = json.encodeToString<List<String>>(cveData.references)
                         it[cweIds] = json.encodeToString<List<String>>(cveData.cweIds)
                         it[hasExploitReference] = cveData.hasExploitReference
                         it[hasPatchReference] = cveData.hasPatchReference
@@ -78,7 +78,7 @@ class NvdRepositoryImpl(private val database: Database) : NvdRepository {
                         it[cvssV2Score] = cveData.cvssV2Score?.toBigDecimal()
                         it[cvssV2Severity] = cveData.cvssV2Severity
                         it[description] = cveData.description
-                        it[references] = json.encodeToString<List<String>>(cveData.references)
+                        it[nvdReferences] = json.encodeToString<List<String>>(cveData.references)
                         it[cweIds] = json.encodeToString<List<String>>(cveData.cweIds)
                         it[hasExploitReference] = cveData.hasExploitReference
                         it[hasPatchReference] = cveData.hasPatchReference
@@ -129,7 +129,7 @@ class NvdRepositoryImpl(private val database: Database) : NvdRepository {
             cvssV2Score = row[NvdCves.cvssV2Score]?.toDouble(),
             cvssV2Severity = row[NvdCves.cvssV2Severity],
             description = row[NvdCves.description],
-            references = json.decodeFromString<List<String>>(row[NvdCves.references]),
+            references = json.decodeFromString<List<String>>(row[NvdCves.nvdReferences]),
             cweIds = json.decodeFromString<List<String>>(row[NvdCves.cweIds]),
             daysOld = java.time.temporal.ChronoUnit.DAYS.between(publishedDate, now),
             daysSinceModified = java.time.temporal.ChronoUnit.DAYS.between(lastModifiedDate, now),

@@ -30,8 +30,8 @@ object NvdCves : Table("nvd_cves") {
 
     // Content
     val description = text("description").nullable()
-    val references = text("references") // Stored as JSON text
-    val cweIds = text("cwe_ids") // Stored as comma-separated or JSON array
+    val nvdReferences = text("nvd_references") // Stored as JSON text
+    val cweIds = text("cwe_ids") // Stored as JSON text
 
     // Reference metadata
     val hasExploitReference = bool("has_exploit_reference").default(false)

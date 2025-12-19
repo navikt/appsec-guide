@@ -1,8 +1,11 @@
 package no.nav.tpt.infrastructure.nvd
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.test.runTest
+import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import org.testcontainers.containers.PostgreSQLContainer
@@ -20,7 +23,7 @@ class NvdRepositoryIntegrationTest {
 
     companion object {
         @Container
-        private val postgresContainer = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+        private val postgresContainer = PostgreSQLContainer<Nothing>("postgres:17-alpine").apply {
             withDatabaseName("nvd_test")
             withUsername("test")
             withPassword("test")
@@ -34,18 +37,22 @@ class NvdRepositoryIntegrationTest {
         fun setUp() {
             postgresContainer.start()
 
-            database = Database.connect(
-                url = postgresContainer.jdbcUrl,
-                driver = "org.postgresql.Driver",
-                user = postgresContainer.username,
+            val hikariConfig = HikariConfig().apply {
+                jdbcUrl = postgresContainer.jdbcUrl
+                username = postgresContainer.username
                 password = postgresContainer.password
-            )
-
-            // Create tables
-            transaction(database) {
-                SchemaUtils.create(NvdCves, NvdSyncStatus)
+                driverClassName = "org.postgresql.Driver"
             }
+            val dataSource = HikariDataSource(hikariConfig)
 
+            // Run Flyway migrations (same as production)
+            val flyway = Flyway.configure()
+                .dataSource(dataSource)
+                .locations("classpath:db/migration")
+                .load()
+            flyway.migrate()
+
+            database = Database.connect(dataSource)
             repository = NvdRepositoryImpl(database)
         }
 
@@ -59,8 +66,8 @@ class NvdRepositoryIntegrationTest {
     @BeforeEach
     fun cleanDatabase() {
         transaction(database) {
-            SchemaUtils.drop(NvdCves, NvdSyncStatus)
-            SchemaUtils.create(NvdCves, NvdSyncStatus)
+            NvdCves.deleteAll()
+            NvdSyncStatus.deleteAll()
         }
     }
 

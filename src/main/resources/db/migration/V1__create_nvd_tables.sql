@@ -28,8 +28,8 @@ CREATE TABLE nvd_cves (
 
     -- Content
     description TEXT,
-    references JSONB,
-    cwe_ids TEXT[],
+    nvd_references TEXT,
+    cwe_ids TEXT,
 
     -- Reference metadata
     has_exploit_reference BOOLEAN DEFAULT FALSE,
@@ -51,7 +51,6 @@ CREATE INDEX idx_nvd_cves_cisa_action_due ON nvd_cves(cisa_action_due) WHERE cis
 
 -- Status and weakness indexes
 CREATE INDEX idx_nvd_cves_vuln_status ON nvd_cves(vuln_status);
-CREATE INDEX idx_nvd_cves_cwe ON nvd_cves USING GIN(cwe_ids);
 
 -- Reference flag indexes for quick filtering
 CREATE INDEX idx_nvd_cves_has_exploit ON nvd_cves(has_exploit_reference) WHERE has_exploit_reference = TRUE;
@@ -81,6 +80,7 @@ COMMENT ON TABLE nvd_cves IS 'Stores CVE data from National Vulnerability Databa
 COMMENT ON COLUMN nvd_cves.cisa_exploit_add IS 'Date CISA added this CVE to Known Exploited Vulnerabilities catalog';
 COMMENT ON COLUMN nvd_cves.cisa_action_due IS 'CISA-mandated deadline for remediation';
 COMMENT ON COLUMN nvd_cves.cisa_required_action IS 'Action required by CISA directive';
+COMMENT ON COLUMN nvd_cves.nvd_references IS 'JSON array of reference URLs from NVD';
 COMMENT ON COLUMN nvd_cves.has_exploit_reference IS 'TRUE if references include tag "Exploit"';
 COMMENT ON COLUMN nvd_cves.has_patch_reference IS 'TRUE if references include tag "Patch"';
 
