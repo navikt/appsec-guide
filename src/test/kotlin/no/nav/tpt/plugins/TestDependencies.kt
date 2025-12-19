@@ -47,6 +47,8 @@ fun Application.installTestDependencies(
         naisTokenIntrospectionEndpoint = "http://test-introspection",
         naisApiUrl = "http://test-nais-api",
         naisApiToken = "test-token",
+        dbJdbcUrl = "jdbc:postgresql://localhost:5432/test_db?user=test&password=test",
+        nvdApiKey = null,
         valkeyHost = "localhost",
         valkeyPort = 6379,
         valkeyUsername = "test",
@@ -57,12 +59,18 @@ fun Application.installTestDependencies(
     val riskScorer = no.nav.tpt.domain.risk.DefaultRiskScorer()
     val vulnService = VulnServiceImpl(naisApiService, kevService, epssService, riskScorer)
 
+    // Mock NVD services for tests (not using real database)
+    val mockNvdRepository = no.nav.tpt.infrastructure.nvd.MockNvdRepository()
+    val mockNvdSyncService = no.nav.tpt.infrastructure.nvd.MockNvdSyncService()
+
     val dependencies = Dependencies(
         config = testConfig,
         tokenIntrospectionService = tokenIntrospectionService,
         naisApiService = naisApiService,
         kevService = kevService,
         epssService = epssService,
+        nvdRepository = mockNvdRepository,
+        nvdSyncService = mockNvdSyncService,
         httpClient = client,
         vulnService = vulnService
     )

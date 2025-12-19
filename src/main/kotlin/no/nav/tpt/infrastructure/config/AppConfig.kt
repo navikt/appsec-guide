@@ -4,6 +4,8 @@ data class AppConfig(
     val naisTokenIntrospectionEndpoint: String,
     val naisApiUrl: String,
     val naisApiToken: String,
+    val dbJdbcUrl: String,
+    val nvdApiKey: String?,
     val valkeyHost: String,
     val valkeyPort: Int,
     val valkeyUsername: String,
@@ -36,6 +38,11 @@ data class AppConfig(
             val valkeyPassword = System.getenv("VALKEY_PASSWORD_$valkeyInstanceName")
                 ?: error("VALKEY_PASSWORD_$valkeyInstanceName not configured")
 
+            val dbJdbcUrl = System.getenv("NAIS_DATABASE_TPT_BACKEND_MYDB_JDBC_URL")
+                ?: error("NAIS_DATABASE_TPT_BACKEND_MYDB_JDBC_URL not configured")
+
+            val nvdApiKey = System.getenv("NVD_API_KEY")
+
             val cacheTtlMinutes = System.getenv("CACHE_TTL_MINUTES")?.toLongOrNull()
                 ?: 5L
 
@@ -43,6 +50,8 @@ data class AppConfig(
                 naisTokenIntrospectionEndpoint = introspectionEndpoint,
                 naisApiUrl = naisApiUrl,
                 naisApiToken = naisApiToken,
+                dbJdbcUrl = dbJdbcUrl,
+                nvdApiKey = nvdApiKey,
                 valkeyHost = valkeyHost,
                 valkeyPort = valkeyPort,
                 valkeyUsername = valkeyUsername,

@@ -41,3 +41,5 @@ bin/
 
 **.graphqls
 .kotlin/
+risk_score_analysis/**
+scripts/**

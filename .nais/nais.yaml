@@ -29,6 +29,12 @@ spec:
   valkey:
     - instance: appsec
       access: readwrite
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_17
+        tier: db-g1-small
+        databases:
+          - name: tpt
   image: {{image}}
   port: 8080
   liveness:
