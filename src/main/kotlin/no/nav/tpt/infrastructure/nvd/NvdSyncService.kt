@@ -13,22 +13,31 @@ open class NvdSyncService(
     suspend fun performInitialSync() {
         logger.info("Starting initial NVD sync - this will take approximately 12-15 hours")
 
-        // Sync year by year from 2002 to present
-        val startYear = 2002
-        val currentYear = LocalDateTime.now().year
+        // NVD API has a 120-day limit on date ranges, so we sync in 90-day chunks
+        val startDate = LocalDateTime.of(2020, 1, 1, 0, 0)
+        val now = LocalDateTime.now()
+        val daysPerChunk = 90
 
-        for (year in startYear..currentYear) {
-            val startDate = LocalDateTime.of(year, 1, 1, 0, 0)
-            val endDate = LocalDateTime.of(year, 12, 31, 23, 59)
+        var currentStart = startDate
+        var chunkNumber = 0
 
-            logger.info("Syncing CVEs from year $year")
-            syncDateRange(startDate, endDate)
+        while (currentStart.isBefore(now)) {
+            val currentEnd = currentStart.plusDays(daysPerChunk.toLong()).let {
+                if (it.isAfter(now)) now else it
+            }
+
+            chunkNumber++
+            logger.info("Syncing CVEs chunk $chunkNumber: ${currentStart.toLocalDate()} to ${currentEnd.toLocalDate()}")
+
+            syncDateRange(currentStart, currentEnd)
 
             // Respect rate limits: 6 seconds between requests (safe for both free and paid tiers)
             delay(6000)
+
+            currentStart = currentEnd.plusSeconds(1)
         }
 
-        logger.info("Initial NVD sync completed successfully")
+        logger.info("Initial NVD sync completed successfully after $chunkNumber chunks")
     }
 
     suspend fun performIncrementalSync() {
