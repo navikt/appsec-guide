@@ -3,7 +3,6 @@ package no.nav.tpt.plugins
 import io.ktor.server.application.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import no.nav.tpt.infrastructure.nvd.NvdSyncLeaderElection
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.hours
 
@@ -11,7 +10,7 @@ fun Application.configureNvdSync() {
     val logger = LoggerFactory.getLogger("NvdSync")
     val nvdSyncService = dependencies.nvdSyncService
     val nvdRepository = dependencies.nvdRepository
-    val leaderElection = NvdSyncLeaderElection(dependencies.database)
+    val leaderElection = dependencies.leaderElection
 
     // Check if we need initial sync
     launch {
@@ -26,11 +25,12 @@ fun Application.configureNvdSync() {
                 // Run initial sync in background with leader election
                 launch {
                     try {
-                        leaderElection.withLeaderLock {
+                        leaderElection.ifLeader {
+                            logger.info("This pod is the leader - performing initial NVD sync")
                             nvdSyncService.performInitialSync()
                         }?.let {
                             logger.info("Initial NVD sync completed successfully!")
-                        }
+                        } ?: logger.info("This pod is not the leader - skipping initial sync")
                     } catch (e: Exception) {
                         logger.error("Initial NVD sync failed", e)
                     }
@@ -51,12 +51,11 @@ fun Application.configureNvdSync() {
 
         while (true) {
             try {
-                logger.info("Attempting to acquire lock for scheduled incremental NVD sync")
-                leaderElection.withLeaderLock {
-                    logger.info("Starting scheduled incremental NVD sync")
+                leaderElection.ifLeader {
+                    logger.info("This pod is the leader - starting scheduled incremental NVD sync")
                     nvdSyncService.performIncrementalSync()
                     logger.info("Scheduled incremental NVD sync completed")
-                }
+                } ?: logger.debug("This pod is not the leader - skipping scheduled sync")
             } catch (e: Exception) {
                 logger.error("Scheduled incremental NVD sync failed", e)
             }
@@ -66,6 +65,6 @@ fun Application.configureNvdSync() {
         }
     }
 
-    logger.info("NVD sync scheduler configured with leader election")
+    logger.info("NVD sync scheduler configured with Kubernetes leader election")
 }
 

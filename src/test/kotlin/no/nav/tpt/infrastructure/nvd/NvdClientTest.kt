@@ -114,6 +114,45 @@ class NvdClientTest {
     }
 
     @Test
+    fun `should format dates as ISO 8601 with UTC timezone`() = runTest {
+        val response = NvdTestDataBuilder.buildNvdResponse(vulnerabilities = emptyList())
+
+        val mockEngine = MockEngine { request ->
+            val startDate = request.url.parameters["lastModStartDate"]
+            val endDate = request.url.parameters["lastModEndDate"]
+
+            assertNotNull(startDate)
+            assertNotNull(endDate)
+
+            // Verify format is ISO 8601 with UTC (ends with Z and has milliseconds)
+            assertTrue(startDate.endsWith("Z"), "Start date should end with Z: $startDate")
+            assertTrue(endDate.endsWith("Z"), "End date should end with Z: $endDate")
+            assertTrue(startDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z")),
+                "Start date should match ISO 8601 format: $startDate")
+            assertTrue(endDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z")),
+                "End date should match ISO 8601 format: $endDate")
+
+            respond(
+                content = json.encodeToString(response),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(json)
+            }
+        }
+
+        val nvdClient = NvdClient(httpClient, null)
+        nvdClient.getCvesByModifiedDate(
+            lastModStartDate = java.time.LocalDateTime.of(2024, 1, 1, 0, 0, 0),
+            lastModEndDate = java.time.LocalDateTime.of(2024, 1, 2, 0, 0, 0)
+        )
+    }
+
+    @Test
     fun `should include API key header when provided`() = runTest {
         val response = NvdTestDataBuilder.buildNvdResponse(vulnerabilities = emptyList())
 
@@ -135,6 +174,60 @@ class NvdClientTest {
 
         val nvdClient = NvdClient(httpClient, "test-api-key")
         nvdClient.getCveByCveId("CVE-2024-1234")
+    }
+
+    @Test
+    fun `should throw exception when NVD API returns 404`() = runTest {
+        val mockEngine = MockEngine { request ->
+            respondError(
+                status = HttpStatusCode.NotFound,
+                content = "Not Found"
+            )
+        }
+
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(json)
+            }
+        }
+
+        val nvdClient = NvdClient(httpClient, null)
+
+        val exception = assertFailsWith<IllegalStateException> {
+            nvdClient.getCvesByModifiedDate(
+                lastModStartDate = java.time.LocalDateTime.of(2024, 1, 1, 0, 0, 0),
+                lastModEndDate = java.time.LocalDateTime.of(2024, 1, 2, 0, 0, 0)
+            )
+        }
+
+        assertTrue(exception.message?.contains("404") == true)
+    }
+
+    @Test
+    fun `should throw exception when NVD API returns 500`() = runTest {
+        val mockEngine = MockEngine { request ->
+            respondError(
+                status = HttpStatusCode.InternalServerError,
+                content = "Internal Server Error"
+            )
+        }
+
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(json)
+            }
+        }
+
+        val nvdClient = NvdClient(httpClient, null)
+
+        val exception = assertFailsWith<IllegalStateException> {
+            nvdClient.getCvesByModifiedDate(
+                lastModStartDate = java.time.LocalDateTime.of(2024, 1, 1, 0, 0, 0),
+                lastModEndDate = java.time.LocalDateTime.of(2024, 1, 2, 0, 0, 0)
+            )
+        }
+
+        assertTrue(exception.message?.contains("500") == true)
     }
 
     @Test

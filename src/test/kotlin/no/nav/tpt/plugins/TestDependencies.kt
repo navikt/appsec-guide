@@ -15,6 +15,7 @@ import no.nav.tpt.infrastructure.cisa.createMockCachedKevService
 import no.nav.tpt.infrastructure.config.AppConfig
 import no.nav.tpt.infrastructure.epss.EpssService
 import no.nav.tpt.infrastructure.epss.MockEpssService
+import no.nav.tpt.plugins.LeaderElection
 import no.nav.tpt.infrastructure.nais.MockNaisApiService
 import no.nav.tpt.infrastructure.nais.NaisApiService
 import no.nav.tpt.infrastructure.vulns.VulnServiceImpl
@@ -72,6 +73,9 @@ fun Application.installTestDependencies(
         password = "stub"
     )
 
+    // Mock leader election - always returns true in tests
+    val mockLeaderElection = LeaderElection(client)
+
     val dependencies = Dependencies(
         config = testConfig,
         tokenIntrospectionService = tokenIntrospectionService,
@@ -81,6 +85,7 @@ fun Application.installTestDependencies(
         database = stubDatabase,
         nvdRepository = mockNvdRepository,
         nvdSyncService = mockNvdSyncService,
+        leaderElection = mockLeaderElection,
         httpClient = client,
         vulnService = vulnService
     )

@@ -15,6 +15,7 @@ import no.nav.tpt.infrastructure.cisa.*
 import no.nav.tpt.infrastructure.config.AppConfig
 import no.nav.tpt.infrastructure.database.DatabaseFactory
 import no.nav.tpt.infrastructure.epss.*
+import no.nav.tpt.plugins.LeaderElection
 import no.nav.tpt.infrastructure.nais.*
 import no.nav.tpt.infrastructure.nvd.*
 import no.nav.tpt.infrastructure.vulns.VulnService
@@ -31,6 +32,7 @@ class Dependencies(
     val database: org.jetbrains.exposed.sql.Database,
     val nvdRepository: NvdRepository,
     val nvdSyncService: NvdSyncService,
+    val leaderElection: LeaderElection,
     val httpClient: HttpClient,
     val vulnService: VulnService
 )
@@ -101,6 +103,8 @@ val DependenciesPlugin = createApplicationPlugin(name = "Dependencies") {
     val nvdRepository = NvdRepositoryImpl(database)
     val nvdSyncService = NvdSyncService(nvdClient, nvdRepository)
 
+    val leaderElection = LeaderElection(httpClient)
+
     val riskScorer = no.nav.tpt.domain.risk.DefaultRiskScorer()
     val vulnService = VulnServiceImpl(naisApiService, kevService, epssService, riskScorer)
 
@@ -113,6 +117,7 @@ val DependenciesPlugin = createApplicationPlugin(name = "Dependencies") {
         database = database,
         nvdRepository = nvdRepository,
         nvdSyncService = nvdSyncService,
+        leaderElection = leaderElection,
         httpClient = httpClient,
         vulnService = vulnService
     )

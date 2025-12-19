@@ -38,6 +38,7 @@ spec:
           - name: tpt
   image: {{image}}
   port: 8080
+  leaderElection: true
   liveness:
     initialDelay: 10
     path: isalive

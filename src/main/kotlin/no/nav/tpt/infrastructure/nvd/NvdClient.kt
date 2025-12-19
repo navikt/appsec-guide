@@ -3,6 +3,7 @@ package no.nav.tpt.infrastructure.nvd
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -25,16 +26,24 @@ class NvdClient(
         startIndex: Int = 0,
         resultsPerPage: Int = 2000
     ): NvdResponse {
-        val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-
         return try {
             val response = httpClient.get(baseUrl) {
-                parameter("lastModStartDate", lastModStartDate.format(formatter))
-                parameter("lastModEndDate", lastModEndDate.format(formatter))
+                parameter("lastModStartDate", formatDateForNvd(lastModStartDate))
+                parameter("lastModEndDate", formatDateForNvd(lastModEndDate))
                 parameter("startIndex", startIndex)
                 parameter("resultsPerPage", resultsPerPage)
                 apiKey?.let { header("apiKey", it) }
                 contentType(ContentType.Application.Json)
+            }
+
+            if (!response.status.isSuccess()) {
+                val errorBody = response.bodyAsText()
+                logger.error(
+                    "NVD API returned error status ${response.status.value}: $errorBody. " +
+                    "URL: $baseUrl?lastModStartDate=${formatDateForNvd(lastModStartDate)}&" +
+                    "lastModEndDate=${formatDateForNvd(lastModEndDate)}&startIndex=$startIndex&resultsPerPage=$resultsPerPage"
+                )
+                throw IllegalStateException("NVD API returned ${response.status.value}: $errorBody")
             }
 
             response.body()
@@ -42,6 +51,12 @@ class NvdClient(
             logger.error("Failed to fetch CVEs from NVD API", e)
             throw e
         }
+    }
+
+    private fun formatDateForNvd(dateTime: LocalDateTime): String {
+        // NVD API requires ISO 8601 format with UTC timezone (e.g., 2024-01-01T00:00:00.000Z)
+        return dateTime.atZone(java.time.ZoneOffset.UTC)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
     }
 
     suspend fun getCveByCveId(cveId: String): CveItem? {
