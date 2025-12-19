@@ -92,6 +92,17 @@ class NvdClient(
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
     }
 
+    private fun parseNvdTimestamp(timestamp: String): LocalDateTime {
+        // NVD API sometimes returns timestamps with 'Z' suffix, sometimes without
+        return if (timestamp.endsWith('Z')) {
+            // Has timezone: 2024-01-01T00:00:00.000Z
+            ZonedDateTime.parse(timestamp).toLocalDateTime()
+        } else {
+            // No timezone: 2002-01-02T05:00:00.000 - parse as LocalDateTime directly
+            LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"))
+        }
+    }
+
     suspend fun getCveByCveId(cveId: String): CveItem? {
         return try {
             val response = httpClient.get(baseUrl) {
@@ -115,8 +126,9 @@ class NvdClient(
     }
 
     fun mapToNvdCveData(cve: CveItem): NvdCveData {
-        val publishedDate = ZonedDateTime.parse(cve.published).toLocalDateTime()
-        val lastModifiedDate = ZonedDateTime.parse(cve.lastModified).toLocalDateTime()
+        // Parse timestamps - NVD API sometimes returns with 'Z' suffix, sometimes without
+        val publishedDate = parseNvdTimestamp(cve.published)
+        val lastModifiedDate = parseNvdTimestamp(cve.lastModified)
         val now = LocalDateTime.now()
 
         val daysOld = ChronoUnit.DAYS.between(publishedDate, now)

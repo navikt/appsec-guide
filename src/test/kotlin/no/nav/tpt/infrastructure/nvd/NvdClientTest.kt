@@ -153,6 +153,40 @@ class NvdClientTest {
     }
 
     @Test
+    fun `should parse timestamps without timezone suffix`() = runTest {
+        // NVD API sometimes returns timestamps without 'Z' suffix
+        val cve = NvdTestDataBuilder.buildCveItem(
+            published = "2002-01-02T05:00:00.000",  // No Z suffix
+            lastModified = "2002-01-03T10:30:00.000"  // No Z suffix
+        )
+        val nvdClient = NvdClient(HttpClient(), null)
+
+        val result = nvdClient.mapToNvdCveData(cve)
+
+        // Should parse successfully
+        assertEquals("CVE-2024-1234", result.cveId)
+        assertNotNull(result.publishedDate)
+        assertNotNull(result.lastModifiedDate)
+    }
+
+    @Test
+    fun `should parse timestamps with timezone suffix`() = runTest {
+        // Normal format with Z suffix
+        val cve = NvdTestDataBuilder.buildCveItem(
+            published = "2024-01-15T10:00:00.000Z",
+            lastModified = "2024-01-16T12:30:00.000Z"
+        )
+        val nvdClient = NvdClient(HttpClient(), null)
+
+        val result = nvdClient.mapToNvdCveData(cve)
+
+        // Should parse successfully
+        assertEquals("CVE-2024-1234", result.cveId)
+        assertNotNull(result.publishedDate)
+        assertNotNull(result.lastModifiedDate)
+    }
+
+    @Test
     fun `should include API key header when provided`() = runTest {
         val response = NvdTestDataBuilder.buildNvdResponse(vulnerabilities = emptyList())
 
