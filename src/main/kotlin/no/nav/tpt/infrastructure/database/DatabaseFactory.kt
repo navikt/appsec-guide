@@ -3,6 +3,7 @@ package no.nav.tpt.infrastructure.database
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import no.nav.tpt.infrastructure.config.AppConfig
+import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.slf4j.LoggerFactory
@@ -29,6 +30,17 @@ object DatabaseFactory {
         }
 
         val dataSource = HikariDataSource(hikariConfig)
+
+        // Run Flyway migrations
+        logger.info("Running Flyway migrations")
+        val flyway = Flyway.configure()
+            .dataSource(dataSource)
+            .locations("classpath:db/migration")
+            .load()
+
+        val migrationsApplied = flyway.migrate()
+        logger.info("Flyway migrations completed: ${migrationsApplied.migrationsExecuted} migrations applied")
+
         val database = Database.connect(dataSource)
 
         // Set transaction isolation level
