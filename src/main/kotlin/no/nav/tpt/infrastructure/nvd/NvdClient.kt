@@ -134,9 +134,9 @@ class NvdClient(
         val cvssV2 = cve.metrics?.cvssMetricV2?.firstOrNull { it.type == "Primary" }
             ?: cve.metrics?.cvssMetricV2?.firstOrNull()
 
-        // Get English description
+        // Get English description (descriptions is required by schema)
         val englishDescription = cve.descriptions
-            ?.firstOrNull { it.lang == "en" }
+            .firstOrNull { it.lang == "en" }
             ?.value
 
         // Extract CWE IDs
@@ -147,14 +147,12 @@ class NvdClient(
             ?.map { it.value }
             ?: emptyList()
 
-        // Extract references and check for exploits/patches
-        val references = cve.references?.map { it.url } ?: emptyList()
+        // Extract references and check for exploits/patches (references is required by schema)
+        val references = cve.references.map { it.url }
         val hasExploitReference = cve.references
-            ?.any { it.tags?.any { tag -> tag.equals("Exploit", ignoreCase = true) } == true }
-            ?: false
+            .any { it.tags?.any { tag -> tag.equals("Exploit", ignoreCase = true) } == true }
         val hasPatchReference = cve.references
-            ?.any { it.tags?.any { tag -> tag.equals("Patch", ignoreCase = true) } == true }
-            ?: false
+            .any { it.tags?.any { tag -> tag.equals("Patch", ignoreCase = true) } == true }
 
         return NvdCveData(
             cveId = cve.id,

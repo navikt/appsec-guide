@@ -36,10 +36,10 @@ data class CveItem(
     val cisaRequiredAction: String?,
     val cisaVulnerabilityName: String?,
 
-    val descriptions: List<CveDescription>?,
-    val metrics: CveMetrics?,
-    val references: List<CveReference>?,
-    val weaknesses: List<CveWeakness>?
+    val descriptions: List<CveDescription>,
+    val metrics: CveMetrics? = null,
+    val references: List<CveReference>,
+    val weaknesses: List<CveWeakness>? = null
 )
 
 @Serializable
@@ -102,8 +102,8 @@ data class CvssDataV2(
 @Serializable
 data class CveReference(
     val url: String,
-    val source: String?,
-    val tags: List<String>?
+    val source: String? = null,
+    val tags: List<String>? = null
 )
 
 @Serializable

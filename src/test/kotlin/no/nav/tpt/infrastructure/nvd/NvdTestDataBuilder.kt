@@ -19,13 +19,13 @@ object NvdTestDataBuilder {
         cisaActionDue: String? = null,
         cisaRequiredAction: String? = null,
         cisaVulnerabilityName: String? = null,
-        descriptions: List<CveDescription>? = listOf(
+        descriptions: List<CveDescription> = listOf(
             CveDescription("en", "A buffer overflow vulnerability exists in the application.")
         ),
         cvssV31: CvssMetricV31? = buildCvssV31Metric(),
         cvssV30: CvssMetricV30? = null,
         cvssV2: CvssMetricV2? = null,
-        references: List<CveReference>? = listOf(
+        references: List<CveReference> = listOf(
             CveReference("https://example.com/advisory", "vendor@example.com", listOf("Vendor Advisory"))
         ),
         weaknesses: List<CveWeakness>? = listOf(
