@@ -12,7 +12,7 @@ API to help developers prioritize which security issues to fix first. Fetches vu
 - `NAIS_TOKEN_INTROSPECTION_ENDPOINT` - Token introspection endpoint (required)
 - `NAIS_API_URL` - NAIS GraphQL API endpoint (required)
 - `NAIS_API_TOKEN` - NAIS API token (required)
-- `NAIS_DATABASE_TPT_BACKEND_MYDB_JDBC_URL` - PostgreSQL JDBC URL (auto-injected by NAIS)
+- `NAIS_DATABASE_TPT_BACKEND_TPT_JDBC_URL` - PostgreSQL JDBC URL (auto-injected by NAIS)
 - `NVD_API_KEY` - NVD API key for higher rate limits (optional)
 - `VALKEY_HOST` - Valkey host (default: localhost)
 - `VALKEY_PORT` - Valkey port (default: 6379)

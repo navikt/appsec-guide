@@ -38,8 +38,8 @@ data class AppConfig(
             val valkeyPassword = System.getenv("VALKEY_PASSWORD_$valkeyInstanceName")
                 ?: error("VALKEY_PASSWORD_$valkeyInstanceName not configured")
 
-            val dbJdbcUrl = System.getenv("NAIS_DATABASE_TPT_BACKEND_MYDB_JDBC_URL")
-                ?: error("NAIS_DATABASE_TPT_BACKEND_MYDB_JDBC_URL not configured")
+            val dbJdbcUrl = System.getenv("NAIS_DATABASE_TPT_BACKEND_TPT_JDBC_URL")
+                ?: error("NAIS_DATABASE_TPT_BACKEND_TPT_JDBC_URL not configured")
 
             val nvdApiKey = System.getenv("NVD_API_KEY")
 
